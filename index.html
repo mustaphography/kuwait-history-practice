@@ -1,0 +1,1623 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>تدريب تاريخ الكويت</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+:root {
+  --bg: #f6f4ef; --surface: #ffffff; --ink: #1d232b; --muted: #6b7380; --line: #e4e0d6;
+  --accent: #0f6e63; --accent-ink: #ffffff; --accent-soft: #e2f1ee;
+  --ok: #1f8a4c; --ok-soft: #e3f5ea; --bad: #c43d3d; --bad-soft: #fbe7e7; --warn: #a86a00; --warn-soft: #fdf1d9;
+  --shadow: 0 1px 2px rgba(0,0,0,.04), 0 8px 24px rgba(0,0,0,.06);
+  --font: "IBM Plex Sans Arabic", "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+/* dark is the default; the header toggle switches to light */
+:root:not([data-theme="light"]) {
+  color-scheme: dark;
+  --bg: #12161b; --surface: #1b2128; --ink: #e8ebef; --muted: #9aa3ae; --line: #2a323c;
+  --accent: #3fb6a3; --accent-ink: #0c1512; --accent-soft: #173430;
+  --ok: #4cc47d; --ok-soft: #173325; --bad: #ef6b6b; --bad-soft: #3a1d1f; --warn: #f0b44c; --warn-soft: #3a2e17;
+  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.25);
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font); line-height: 1.6; }
+#app { max-width: 760px; margin: 0 auto; padding: 20px 16px 48px; }
+button { font: inherit; color: inherit; cursor: pointer; }
+
+.top { margin-bottom: 16px; }
+.title-actions { display: flex; gap: 8px; }
+.title-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+h1 { font-size: 1.3rem; margin: 0; font-weight: 700; }
+.chips { display: flex; gap: 8px; flex-wrap: wrap; margin: 14px 0 12px; }
+.chips button { border: 1px solid var(--line); background: var(--surface); border-radius: 12px; padding: 6px 12px; display: flex; flex-direction: column; align-items: flex-start; line-height: 1.3; font-weight: 600; }
+.chips button small { font-weight: 400; color: var(--muted); font-size: .72rem; }
+.chips button.on { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.chips button.on small { color: inherit; opacity: .85; }
+.row { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.seg { display: inline-flex; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 3px; }
+.seg button { border: 0; background: none; padding: 6px 12px; border-radius: 9px; font-weight: 600; color: var(--muted); }
+.seg button.on { background: var(--accent-soft); color: var(--accent); }
+.badge:not(:empty) { background: var(--bad); color: #fff; border-radius: 999px; padding: 0 7px; font-size: .75rem; margin-inline-start: 4px; }
+.score { display: flex; gap: 12px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.score .ok { color: var(--ok); } .score .bad { color: var(--bad); } .score .st { color: var(--warn); }
+
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 24px; box-shadow: var(--shadow); }
+.card.pop { animation: pop .22s ease-out; }
+@keyframes pop { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.meta { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+.tag { font-size: .78rem; font-weight: 600; padding: 2px 10px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); }
+.tag:empty { display: none; }
+.tag.soft { background: transparent; border: 1px solid var(--line); color: var(--muted); }
+.tag.warn { background: var(--warn-soft); color: var(--warn); }
+.q { font-size: 1.25rem; font-weight: 700; margin: 4px 0 20px; line-height: 1.7; }
+
+.choices { display: grid; gap: 10px; }
+.choices.tf { grid-template-columns: 1fr 1fr; }
+.choice { display: flex; align-items: center; gap: 12px; text-align: start; width: 100%; padding: 14px 16px; border-radius: 14px; border: 2px solid var(--line); background: var(--surface); font-size: 1.02rem; transition: border-color .12s, background .12s, transform .08s; }
+.choice:hover:not(:disabled) { border-color: var(--accent); background: var(--accent-soft); }
+.choice:active:not(:disabled) { transform: scale(.99); }
+.choice .k { flex: none; width: 28px; height: 28px; border-radius: 8px; display: grid; place-items: center; background: var(--bg); color: var(--muted); font-size: .85rem; font-weight: 700; }
+.choice:disabled { cursor: default; }
+.choice.correct { border-color: var(--ok); background: var(--ok-soft); }
+.choice.correct .k { background: var(--ok); color: #fff; }
+.choice.chosen-wrong { border-color: var(--bad); background: var(--bad-soft); animation: shake .3s; }
+.choice.chosen-wrong .k { background: var(--bad); color: #fff; }
+.choice.dim { opacity: .5; }
+@keyframes shake { 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+
+.feedback { margin-top: 18px; padding: 16px; border-radius: 14px; animation: pop .2s ease-out; }
+.feedback.ok { background: var(--ok-soft); }
+.feedback.bad { background: var(--bad-soft); }
+.verdict { font-weight: 800; font-size: 1.1rem; }
+.feedback.ok .verdict { color: var(--ok); } .feedback.bad .verdict { color: var(--bad); }
+.answer { margin-top: 6px; }
+.explain { margin-top: 8px; color: var(--ink); opacity: .85; font-size: .95rem; }
+.primary { margin-top: 14px; border: 0; background: var(--accent); color: var(--accent-ink); font-weight: 700; padding: 10px 22px; border-radius: 12px; }
+.ghost { border: 1px solid var(--line); background: var(--surface); padding: 6px 14px; border-radius: 10px; font-weight: 600; }
+.ghost.danger { color: var(--bad); }
+.hint { text-align: center; color: var(--muted); font-size: .8rem; margin-top: 14px; }
+@media (hover: none) { .hint { display: none; } }
+
+.toast { position: fixed; bottom: 20px; left: 50%; transform: translate(-50%, 20px); background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 12px; opacity: 0; pointer-events: none; transition: .25s; max-width: calc(100% - 32px); }
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+dialog { border: 0; border-radius: 20px; padding: 0; background: var(--surface); color: var(--ink); width: min(560px, calc(100% - 32px)); box-shadow: var(--shadow); }
+dialog::backdrop { background: rgba(0,0,0,.4); }
+.dlg { padding: 22px; }
+.dlg h3 { margin: 0 0 14px; } .dlg h4 { margin: 18px 0 8px; }
+.kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
+.kpis div { background: var(--bg); border-radius: 12px; padding: 10px; text-align: center; }
+.kpis b { display: block; font-size: 1.3rem; } .kpis span { color: var(--muted); font-size: .8rem; }
+.bar { display: grid; grid-template-columns: 70px 1fr 56px; align-items: center; gap: 10px; font-size: .85rem; margin: 6px 0; }
+.track { height: 8px; background: var(--bg); border-radius: 99px; overflow: hidden; }
+.track i { display: block; height: 100%; background: var(--accent); }
+.weak { padding-inline-start: 20px; margin: 0; max-height: 240px; overflow: auto; }
+.weak li { margin: 4px 0; font-size: .88rem; }
+.weak li em { color: var(--muted); font-style: normal; margin-inline-start: 8px; font-size: .78rem; }
+.muted { color: var(--muted); }
+.dlg-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 18px; }
+.dlg-actions .primary { margin: 0; }
+
+@media (max-width: 520px) {
+  .card { padding: 18px; border-radius: 16px; }
+  .q { font-size: 1.1rem; }
+  .choices.tf { grid-template-columns: 1fr; }
+}
+
+.fig { display: flex; justify-content: center; margin: -6px 0 18px; padding: 12px; background: var(--bg); border-radius: 14px; overflow-x: auto; }
+.fig svg, .choice svg, .answer svg { color: var(--ink); max-width: 100%; height: auto; }
+.choice .t svg { display: block; }
+.fig text, .choice svg text, .answer svg text { fill: currentColor; font-family: var(--font); }
+svg .zero { fill: var(--surface); }
+.fig svg .zero { fill: var(--bg); }
+.choice.correct svg .zero { fill: var(--ok-soft); }
+.choice.chosen-wrong svg .zero { fill: var(--bad-soft); }
+
+.tag.soft.short, .tag.soft.open { border-color: var(--accent); color: var(--accent); }
+.sa { display: flex; gap: 10px; }
+.sa input, textarea { flex: 1; width: 100%; font: inherit; font-size: 1.05rem; color: var(--ink); background: var(--bg); border: 2px solid var(--line); border-radius: 14px; padding: 12px 14px; outline: none; }
+.sa input:focus, textarea:focus { border-color: var(--accent); }
+.sa input:disabled { opacity: .7; }
+.sa .primary, #showBtn { margin-top: 0; }
+textarea { resize: vertical; margin-bottom: 12px; display: block; }
+.small { font-size: .88rem; margin: -8px 0 12px; }
+.mine { text-decoration: line-through; opacity: .8; }
+.feedback.neutral { background: var(--accent-soft); }
+.model { margin-top: 6px; line-height: 1.8; }
+.fb-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 14px; }
+.fb-actions .primary, .fb-actions .ghost { margin-top: 0; }
+.primary.okb { background: var(--ok); } .primary.badb { background: var(--bad); color: #fff; }
+.primary:disabled { opacity: .5; cursor: default; }
+
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+  <script>
+// HST102 — Kuwait History question bank.
+// Tables: each row is one fact; every template asks that fact from a different angle.
+// Items: hand-written facts with several question variants.
+// Lists: "which of these is / is NOT one of ..." sets.
+// To add a lesson: add rows/items/lists with the new lesson number and add it to `lessons`.
+
+window.DECK = {
+  id: "hst102",
+  title: "تاريخ الكويت — HST102",
+  lang: "ar",
+  shortRate: 0.5, // share of short-answer-capable questions asked as typed answers
+  lessons: [
+    { n: 1, name: "تدوين تاريخ الكويت" },
+    { n: 2, name: "الخليج العربي وملامح الكويت" },
+    { n: 3, name: "العتوب الآباء المؤسسون" },
+  ],
+
+  tables: [
+    {
+      id: "books", lesson: 1, label: "الكتب والمؤلفات",
+      numeric: ["year"],
+      extra: { year: ["1936", "1950", "1971", "1955"] },
+      explain: "«{title}» — {author}{yearText}. {desc}",
+      templates: [
+        { ask: "author", q: "من مؤلف كتاب «{title}»؟", short: true },
+        { ask: "title", q: "أي من الكتب التالية من تأليف {author}؟" },
+        { ask: "year", q: "في أي عام صدر كتاب «{title}»؟", short: true },
+        { ask: "title", q: "أي كتاب صدر عام {year}م؟", short: true },
+        { ask: "author", q: "من المؤلف الذي صدر كتابه عن تاريخ الكويت عام {year}م؟", short: true },
+        { ask: ["author", "year"], q: "كتاب «{title}»: من مؤلفه ومتى صدر؟" },
+        { ask: "title", q: "أي كتاب ينطبق عليه الوصف التالي: {desc}" },
+        { ask: "author", q: "{desc} — من مؤلف هذا الكتاب؟", short: true },
+        { tf: "author", q: "كتاب «{title}» من تأليف {author}." },
+        { tf: "year", q: "صدر كتاب «{title}» عام {year}م." },
+      ],
+      rows: [
+        { id: "rashid", title: "تاريخ الكويت", author: "عبد العزيز الرشيد", year: "1926",
+          desc: "أهم وأول كتاب محلي تناول تاريخ إمارة الكويت، ويُعد أول سجل مدوّن موسّع لتاريخها منذ التأسيس." },
+        { id: "qenaei", title: "صفحات من تاريخ الكويت", author: "يوسف بن عيسى القناعي", year: "1946",
+          desc: "ثاني أهم كتاب محلي عن تاريخ الكويت، وهو موجز مبسط لأبناء المدارس." },
+        { id: "shamlan", title: "مِن تاريخ الكويت", author: "سيف مرزوق الشملان", year: "1959",
+          desc: "يتناول بشكل مركّز مظاهر مختلفة من الجوانب السياسية للكويت." },
+        { id: "khazal", title: "تاريخ الكويت السياسي", author: "حسين خزعل", year: "1962",
+          desc: "يتكون من خمسة أجزاء (صدر الجزء الأول 1962م) وتناول التاريخ بتوسع من حيث التفاصيل والشخصيات." },
+        { id: "abuhakima", title: "تاريخ الكويت – الجزء الأول (لجنة تاريخ الكويت)", author: "أحمد مصطفى أبو حاكمة", year: "1967",
+          desc: "كتبه منفرداً بعد قرار اللجنة عام 1965م، وكان معبّراً عن نمط جديد في كتابة تاريخ الإمارة." },
+        { id: "lorimer", title: "سجل الأحداث في الخليج وعمان ووسط الجزيرة", author: "ج. ج. لوريمر", year: "",
+          desc: "عُرف لاحقاً باسم «دليل الخليج»، وهو موسوعة تاريخية وجغرافية وإحصائية للمبعوثين البريطانيين." },
+        { id: "dickson1", title: "الكويت وجاراتها", author: "هارولد ديكسون", year: "",
+          desc: "أحد كتابَي المعتمد السياسي البريطاني في الكويت." },
+        { id: "dickson2", title: "عرب الصحراء", author: "هارولد ديكسون", year: "",
+          desc: "أحد كتابَي المعتمد السياسي البريطاني في الكويت." },
+        { id: "niebuhr", title: "وصف شبه جزيرة العرب", author: "كارستن نيبور", year: "",
+          desc: "يحتوي على خريطة تظهر عليها تسمية «القرين»." },
+      ],
+    },
+
+    {
+      id: "westerners", lesson: 1, label: "الكويت بعيون غربية",
+      numeric: ["year"],
+      explain: "{person}: {role}{yearText}. {deed}",
+      templates: [
+        { ask: "role", q: "ما صفة «{person}» الذي كتب عن الكويت؟" },
+        { ask: "person", q: "من هو {role} الذي كتب عن الكويت؟", short: true },
+        { ask: "year", q: "ما السنة المرتبطة بـ«{person}» في المصادر الغربية عن الكويت؟", short: true },
+        { ask: "person", q: "أي شخصية غربية ترتبط بعام {year}م؟" },
+        { ask: "person", q: "من الذي {deed}؟", short: true },
+        { ask: "deed", q: "ماذا فعل/كتب «{person}» عن الكويت؟" },
+        { ask: ["person", "year"], q: "من {role}، ومتى ارتبط اسمه بالكويت؟" },
+        { tf: "role", q: "«{person}» هو {role}." },
+        { tf: "year", q: "ارتبط «{person}» بالكويت عام {year}م." },
+      ],
+      rows: [
+        { id: "niebuhr", person: "كارستن نيبور", role: "رحالة زار المنطقة لاستكشافها", year: "1761",
+          deed: "زار المنطقة عام 1761م لاستكشافها، وتظهر على خريطته تسمية «القرين»" },
+        { id: "buckingham", person: "باكنجهام", role: "الرحالة والصحفي الإنجليزي", year: "1816",
+          deed: "قال: «الكويت مستقلة، والكويتيون أكثر أهل الخليج حبّاً للحرية والإقدام»" },
+        { id: "lusher", person: "لوشر", role: "الرحالة الأمريكي", year: "1868",
+          deed: "وصف الكويت بأنها «متطورة ونظيفة عن غيرها من المدن» وقدّر سكانها بين 15 و20 ألف نسمة" },
+        { id: "taylor", person: "روبرت تيلور", role: "مساعد الوكيل السياسي في العراق", year: "1818",
+          deed: "كتب تقريراً وثائقياً تناول تاريخ العتوب" },
+        { id: "warden", person: "فرانسيس واردن", role: "أحد موظفي حكومة بومباي الإنجليزية", year: "1819",
+          deed: "كتب مقالة عن العتوب وتأسيس السلطة" },
+        { id: "lorimer", person: "ج. ج. لوريمر", role: "موظف الإدارة البريطانية الهندية", year: "",
+          deed: "ألّف أهم مؤلَّف غربي موسّع: «سجل الأحداث في الخليج وعمان ووسط الجزيرة» (دليل الخليج)" },
+        { id: "brydges", person: "هارفرد جونز بريدجز", role: "المعتمد السياسي لشركة الهند الشرقية في البصرة", year: "1784",
+          deed: "عمل معتمداً سياسياً لشركة الهند الشرقية في البصرة اعتباراً من 1784م وكتب عن الكويت" },
+        { id: "pelly", person: "لويس بيلي", role: "المقيم السياسي البريطاني في بوشهر", year: "1863 و1865",
+          deed: "زار الكويت مرتين (1863م و1865م)، وذكر أن أول الشيوخ أقبل عبر خور بوبيان" },
+        { id: "dickson", person: "هارولد ديكسون", role: "المعتمد السياسي البريطاني في الكويت", year: "1929–1959",
+          deed: "ألّف «الكويت وجاراتها» و«عرب الصحراء»، وعاش في الكويت فترات بين 1929 و1959م" },
+        { id: "stocqueler", person: "ستوكويلر", role: "الرحالة البريطاني", year: "1831",
+          deed: "ذكر أن بحارة السفينة الكويتية «الناصري» نحو خمسين بحاراً كلهم من الكويت أو القرين" },
+      ],
+    },
+
+    {
+      id: "timeline", lesson: 0, label: "التواريخ",
+      numeric: ["year"],
+      explain: "{event}: {year}م.",
+      templates: [
+        { ask: "year", q: "متى كان/كانت: {event}؟", short: true },
+        { ask: "event", q: "ماذا حدث عام {year}م؟" },
+        { tf: "year", q: "{event} كان عام {year}م." },
+      ],
+      rows: [
+        { id: "rashid", lesson: 1, event: "طباعة كتاب «تاريخ الكويت» لعبد العزيز الرشيد", year: "1926" },
+        { id: "qenaei", lesson: 1, event: "صدور «صفحات من تاريخ الكويت» ليوسف القناعي", year: "1946" },
+        { id: "shamlan", lesson: 1, event: "صدور «مِن تاريخ الكويت» لسيف مرزوق الشملان", year: "1959" },
+        { id: "committee", lesson: 1, event: "تشكيل لجنة كتابة تاريخ الكويت", year: "1959" },
+        { id: "khazal", lesson: 1, event: "صدور الجزء الأول من «تاريخ الكويت السياسي» لحسين خزعل", year: "1962" },
+        { id: "abuhakima65", lesson: 1, event: "قرار اللجنة الاستعانة بأحمد أبو حاكمة لاستكمال كتابة التاريخ منفرداً", year: "1965" },
+        { id: "abuhakima67", lesson: 1, event: "طبع «تاريخ الكويت – الجزء الأول» (لجنة تاريخ الكويت)", year: "1967" },
+        { id: "niebuhr", lesson: 1, event: "زيارة كارستن نيبور للمنطقة لاستكشافها", year: "1761" },
+        { id: "brydges", lesson: 1, event: "بدء عمل هارفرد جونز بريدجز معتمداً سياسياً في البصرة", year: "1784" },
+        { id: "buckingham", lesson: 1, event: "زيارة الرحالة الإنجليزي باكنجهام للكويت", year: "1816" },
+        { id: "taylor", lesson: 1, event: "تقرير روبرت تيلور الوثائقي عن العتوب", year: "1818" },
+        { id: "warden", lesson: 1, event: "مقالة فرانسيس واردن عن العتوب وتأسيس السلطة", year: "1819" },
+        { id: "stocqueler", lesson: 3, event: "حديث ستوكويلر عن بحارة السفينة «الناصري»", year: "1831" },
+        { id: "pelly", lesson: 1, event: "زيارتا لويس بيلي للكويت", year: "1863 و1865" },
+        { id: "lusher", lesson: 1, event: "زيارة الرحالة الأمريكي لوشر وتقديره سكان الكويت", year: "1868" },
+        { id: "suez", lesson: 2, event: "افتتاح قناة السويس (وتراجع النشاط البحري في الخليج)", year: "1869" },
+        { id: "karmali", lesson: 3, event: "مقال الأب أنستاس الكرملي عن أصل اسم الكويت", year: "1904" },
+        { id: "oil", lesson: 2, event: "الاحتفال بتصدير أول شحنة من النفط الكويتي", year: "1946" },
+        { id: "aarhus", lesson: 2, event: "بدء بعثة متحف أرهوس الدنماركي أعمالها في الكويت", year: "1958" },
+        { id: "subiya98", lesson: 2, event: "بدء المسح الأثري في الصبية (البعثة الكويتية–البريطانية)", year: "1998" },
+        { id: "subiya07", lesson: 2, event: "استكمال التنقيب في الصبية (البعثة الكويتية–البولندية)", year: "2007" },
+      ],
+    },
+
+    {
+      id: "views", lesson: 3, label: "آراء المؤرخين والمصادر",
+      explain: "{who} — {topic}: {claim}",
+      templates: [
+        { ask: "who", q: "من صاحب هذا القول/الرأي: «{claim}»؟", short: true },
+        { ask: "claim", q: "ما رأي {who} في {topic}؟" },
+        { tf: "who", q: "القائل بأن «{claim}» هو {who}." },
+      ],
+      rows: [
+        { id: "rashid-haddar", who: "عبد العزيز الرشيد", topic: "سبب هجرة العتوب من الهدّار",
+          claim: "نزاعات وخلافات قبلية بين آل صباح وآل خليفة وبين الدواسر، وربما الضغوط القبلية أو كِبَر نفوسهم وطموحهم" },
+        { id: "shamlan-haddar", who: "سيف مرزوق الشملان", topic: "سبب هجرة العتوب من الهدّار",
+          claim: "الهجرة جاءت بسبب فِتن بين الدواسر وبين آل خليفة وآل صباح" },
+        { id: "rashid-route", who: "عبد العزيز الرشيد", topic: "مسار العتوب بعد ترك قطر",
+          claim: "اتجهوا نحو جزيرة قيس، ورحل آخرون إلى المخراق قرب أم قصر ثم خور الصبية ثم الكويت بعد الاستئذان من بني خالد" },
+        { id: "qenaei-route", who: "يوسف بن عيسى القناعي", topic: "مسار العتوب بعد ترك قطر",
+          claim: "تفرقوا إلى موانئ الشاطئ الشرقي، ثم عادوا للتجمع في الكويت" },
+        { id: "pelly-route", who: "لويس بيلي", topic: "انتقال آل صباح إلى الكويت",
+          claim: "أقبل أول الشيوخ عبر خور بوبيان مع أتباعه وحطّ الرحال على الخليج الذي يُسمى خليج الكويت أو القرين" },
+        { id: "rashid-kut", who: "عبد العزيز الرشيد", topic: "باني الكوت",
+          claim: "الذي بنى الكوت هو محمد لصكة بن عريعر، واتخذه مستودعاً للذخيرة والسلاح" },
+        { id: "karmali-name", who: "الأب أنستاس الكرملي", topic: "أصل كلمة الكويت",
+          claim: "الكلمة مشتقة من الكوت، وهو البيت الذي يُبنى على شكل قلعة ليسهل الدفاع عنه" },
+        { id: "rashid-kutmeaning", who: "عبد العزيز الرشيد", topic: "معنى الكوت",
+          claim: "الكوت هو المكان القريب من الماء سواء كان بحراً أم نهراً أم بحيرة" },
+        { id: "abuhakima-qrain", who: "أحمد مصطفى أبو حاكمة", topic: "الاسم القديم للكويت",
+          claim: "الاسم القديم للكويت في المصادر الغربية هو القرين، مستدلاً بخريطة نيبور" },
+        { id: "abuhakima-utub", who: "أحمد مصطفى أبو حاكمة", topic: "سبب تسمية العتوب",
+          claim: "اشتقاق أسماء القبائل من الأفعال كان مألوفاً في شرق الجزيرة، وكان يُشار إليهم ببني عتبة والعتوبيين" },
+        { id: "abdullah-utub", who: "الشيخ عبد الله السالم الصباح (في جوابه لديكسون)", topic: "سبب تسمية العتوب",
+          claim: "الاسم من الفعل «عَتَب» أي الإكثار من الترحال، لأن أجداده ارتحلوا شمالاً إلى الكويت" },
+        { id: "buckingham-name", who: "باكنجهام", topic: "اسم الكويت",
+          claim: "لا ميناء يلي القطيف وله أهمية سوى ميناء القرين، بينما لا يعرفها العرب إلا باسم الكويت" },
+        { id: "stocqueler-name", who: "ستوكويلر", topic: "اسم الكويت",
+          claim: "بحارة السفينة «الناصري» نحو خمسين بحاراً، وهم جميعاً من الكويت أو القرين" },
+      ],
+    },
+
+    {
+      id: "gulfnames", lesson: 2, label: "تسميات الخليج",
+      extra: { name: ["البحر الأدنى", "بحر الشروق الكبير", "بحر القلزم"], by: ["الفرس الساسانيون", "البرتغاليون"] },
+      explain: "اسم «{name}» أطلقه {by}.",
+      templates: [
+        { ask: "by", q: "من أطلق على الخليج اسم «{name}»؟", short: true },
+        { ask: "name", q: "ما الاسم الذي أطلقه {by} على الخليج؟", short: true },
+        { tf: "by", q: "{by} أطلقوا على الخليج اسم «{name}»." },
+      ],
+      rows: [
+        { id: "persian", name: "الخليج الفارسي", by: "الإغريق (أول من أطلقه)" },
+        { id: "arabian", name: "الخليج العربي", by: "الرومان في القرن الأول الميلادي" },
+        { id: "arabsea", name: "بحر العرب", by: "المسلمون في العهد الإسلامي" },
+      ],
+    },
+
+    {
+      id: "sites", lesson: 2, label: "المواقع الأثرية",
+      explain: "{site}: {fact}",
+      templates: [
+        { ask: "site", q: "أي موقع أثري ينطبق عليه: {fact}؟", short: true },
+        { ask: "fact", q: "ما الصحيح عن موقع «{site}»؟" },
+        { tf: "site", q: "الموقع الذي {fact} هو «{site}»." },
+      ],
+      rows: [
+        { id: "failaka", site: "جزيرة فيلكا", fact: "دُرّة المواقع الأثرية، ووردت في النصوص اليونانية باسم «إيكاروس»" },
+        { id: "talsaeed", site: "تل سعيد (ف 5)", fact: "فيه القلعة الهلنستية (القرن الثالث ق.م) وحجر منقوش بالكتابة اليونانية يشير إلى اسم «إيكاروس»" },
+        { id: "subiya", site: "الصُّبيّة", fact: "من أهم مواقع الاستيطان في الشرق الأدنى، ويرتبط بحضارة العُبيد (5500–3500 ق.م)" },
+        { id: "akkaz", site: "عِكّاز", fact: "تل أثري يقع شمال غرب ميناء الشويخ" },
+        { id: "kazima", site: "كاظمة", fact: "ازدهر ميناؤها من منتصف القرن السادس حتى نهاية القرن السابع الميلاديين، وكان محطة مهمة على طريق التجارة والحج" },
+      ],
+    },
+
+    {
+      id: "failakacodes", lesson: 2, label: "رموز تلال فيلكا",
+      extra: { code: ["ف 1", "ف 2", "ف 6"] },
+      explain: "{tell} رمزه ({code}).",
+      templates: [
+        { ask: "code", q: "ما رمز «{tell}» في جزيرة فيلكا؟", short: true },
+        { ask: "tell", q: "أي تل في فيلكا رمزه ({code})؟" },
+      ],
+      rows: [
+        { id: "saad", tell: "تل سعد", code: "ف 3" },
+        { id: "diyafa", tell: "دار الضيافة", code: "ف 4" },
+        { id: "saeed", tell: "تل سعيد", code: "ف 5" },
+        { id: "qasr", tell: "قصر الحاكم", code: "ف 5" },
+      ],
+    },
+
+    {
+      id: "missions", lesson: 2, label: "البعثات الأثرية",
+      numeric: ["year"],
+      extra: { year: ["1964", "1985", "2012"], mission: ["البعثة الإيطالية", "البعثة الأمريكية"], site: ["عكاز", "كاظمة"] },
+      explain: "{mission}: بدأت عام {year}م في {site}.",
+      templates: [
+        { ask: "year", q: "متى بدأت {mission} أعمالها؟", short: true },
+        { ask: "mission", q: "أي بعثة بدأت أعمالها عام {year}م؟" },
+        { ask: "site", q: "أين عملت {mission}؟", short: true },
+        { ask: ["site", "year"], q: "{mission}: أين عملت ومتى؟" },
+      ],
+      rows: [
+        { id: "aarhus", mission: "بعثة متحف أرهوس الدنماركي", year: "1958", site: "جزيرة فيلكا" },
+        { id: "kb", mission: "البعثة الكويتية–البريطانية", year: "1998", site: "الصبية" },
+        { id: "kp", mission: "البعثة الكويتية–البولندية", year: "2007", site: "الصبية" },
+      ],
+    },
+  ],
+
+  lists: [
+    { id: "society", lesson: 3, label: "ملامح التشكيلات المجتمعية في الكويت بعد استقرار العتوب",
+      members: ["الغوص", "صيد السمك", "التجارة البحرية", "صناعة السفن"],
+      distractors: ["الزراعة", "رعي الإبل", "التعدين", "صناعة النسيج"] },
+    { id: "location", lesson: 2, label: "أسباب تميّز موقع الكويت الجغرافي",
+      members: [
+        "النهاية الطبيعية للطريق الملاحي والتجاري على طريق الهند والشرق الأقصى",
+        "مركز تجاري للوافدين من نجد والإحساء وبادية الشام",
+        "منطقة تجارة عبور (ترانزيت) قليلة الضرائب",
+        "فيها أحد أهم الموانئ في المنطقة",
+        "تميّز الكويتيين في نقل التجارة بين موانئ الخليج والهند والشرق الأفريقي",
+      ],
+      distractors: ["وفرة الأنهار والأراضي الزراعية", "قربها من قناة السويس", "إطلالتها على البحر الأحمر", "كثرة الغابات والمراعي"] },
+    { id: "fureiha", lesson: 3, label: "أهمية استقرار العتوب في الفريحة بقطر",
+      members: [
+        "التحول من حياة البداوة إلى الاستقرار والتوجه للبحر",
+        "إتقان المهن البحرية وخاصة الغوص على اللؤلؤ",
+        "ممارسة التنقل بين موانئ الخليج والطرق التجارية",
+        "التعاون التجاري مع البحرين",
+        "التعرف على الطرق البحرية بين الهند وجنوب البصرة",
+        "التعرف على طبيعة المنطقة والأماكن الصالحة للاستقرار",
+      ],
+      distractors: ["تعلم الزراعة في الواحات", "تأسيس جيش بري كبير", "التحالف مع العثمانيين ضد بني خالد", "اكتشاف النفط"] },
+    { id: "utubfamilies", lesson: 3, label: "أشهر من ينتمي إلى العتوب",
+      members: ["آل الصباح", "آل خليفة", "الجلاهمة"],
+      distractors: ["آل مسلم", "بنو خالد", "الدواسر", "آل عريعر"] },
+    { id: "powers", lesson: 3, label: "القوى الكبرى التي انشغلت بالمنافسات فيما بينها (فنمت تشكيلات العتوب بهدوء)",
+      members: ["إنجلترا", "هولندا", "فرنسا", "الدولة العثمانية", "فارس"],
+      distractors: ["روسيا", "ألمانيا", "إسبانيا", "اليابان"] },
+    { id: "eastciv", lesson: 2, label: "الحضارات الأساسية الثلاث شرق الخليج العربي",
+      members: ["العيلامية", "الميدية", "فارس"],
+      distractors: ["السومرية", "الفرعونية", "الفينيقية", "بلاد النهرين"] },
+    { id: "committee", lesson: 1, label: "أعضاء لجنة كتابة تاريخ الكويت (1959م)",
+      members: ["عبد العزيز الدوري", "صالح العلي", "أحمد مصطفى أبو حاكمة", "حسين خزعل"],
+      distractors: ["كارستن نيبور", "لويس بيلي", "ج. ج. لوريمر", "سيف مرزوق الشملان", "يوسف بن عيسى القناعي"] },
+    { id: "failakatells", lesson: 2, label: "التلال والمواقع الأثرية في جزيرة فيلكا",
+      members: ["تل سعد", "دار الضيافة", "تل سعيد", "قصر الحاكم", "القلعة الهلنستية"],
+      distractors: ["الصبية", "عكاز", "كاظمة", "المخراق"] },
+    { id: "banikhalid", lesson: 3, label: "أسباب سماح بني خالد للعتوب بالاستقرار في الكويت",
+      members: ["ربما محاولة إشراك العتوب معهم في صراعاتهم ضد العثمانيين", "الكويت لم تكن قد برزت أهميتها التجارية والاقتصادية بعد"],
+      distractors: ["خوف بني خالد من قوة العتوب العسكرية", "دفع العتوب جزية سنوية كبيرة", "طلب الدولة العثمانية ذلك", "رغبة بني خالد في ترك المنطقة"] },
+    { id: "continents", lesson: 2, label: "قارات العالم القديم التي يتوسطها الخليج العربي",
+      members: ["آسيا", "أفريقيا", "أوروبا"],
+      distractors: ["أمريكا الشمالية", "أستراليا", "أمريكا الجنوبية"] },
+    { id: "gulfnamesall", lesson: 2, label: "التسميات التي أُطلقت على الخليج العربي عبر التاريخ",
+      members: ["البحر الأدنى", "بحر الشروق الكبير", "الخليج الفارسي", "الخليج العربي", "بحر العرب"],
+      distractors: ["بحر القلزم", "بحر الروم", "بحر الظلمات", "البحر الأبيض"] },
+    { id: "rashidroute", lesson: 3, label: "المحطات التي ذكرها الرشيد للعتوب بعد ترك قطر",
+      members: ["جزيرة قيس", "المخراق قرب أم قصر", "خور الصبية"],
+      distractors: ["مسقط", "عدن", "جدة", "الزبارة"] },
+  ],
+
+  items: [
+    // ---------- Explain questions (self-graded) ----------
+    { id: "open-oral", lesson: 1, variants: [{ open: "اشرح كيف كانت الرواية الشفوية تؤدي دوراً في تناقل التاريخ الكويتي قبل ظهور المؤلفات المحلية.",
+      model: "كانت الرواية الشفوية الوسيلة الرئيسية لتناقل تاريخ الكويت، إذ كان تداول المعلومات التاريخية يجري من خلال المجالس والدواوين، في ظل خلو الربع الأول من القرن العشرين من مؤلفات محلية تتناول تاريخ الكويت." }] },
+    { id: "open-rashid", lesson: 1, variants: [{ open: "اذكر أهمية كتاب «تاريخ الكويت» لعبد العزيز الرشيد، مع بيان سنة طباعته.",
+      model: "طُبع سنة 1926م، وهو أهم وأول كتاب محلي تناول تاريخ إمارة الكويت، ويُعد أول سجل مدوّن لتاريخ الإمارة بشكل موسّع، وقد تناول تاريخ الكويت منذ التأسيس وحتى الفترة التي عاصرها المؤلف." }] },
+    { id: "open-committee", lesson: 1, variants: [{ open: "ما الدافع إلى تشكيل «لجنة كتابة تاريخ الكويت» عام 1959م؟ ومن اقترحها ومن أعضاؤها؟",
+      model: "ظهرت في نهاية الخمسينيات الحاجة إلى مؤلَّف تاريخي يبرز أهمية الكويت ودورها ويساعد على التصدي للتحديات والادعاءات، فشُكّلت اللجنة عام 1959م لكتابة التاريخ رسمياً بمقترح من الشيخ صباح الأحمد الصباح رئيس دائرة المطبوعات والنشر. ضمّت: د. عبد العزيز الدوري وصالح العلي (عراقيان)، ود. أحمد مصطفى أبو حاكمة (فلسطين)، وحسين خزعل." }] },
+    { id: "open-western", lesson: 1, variants: [{ open: "اذكر ثلاثة من الغربيين الذين كتبوا عن الكويت مع ما يرتبط بكل منهم.",
+      model: "أمثلة: كارستن نيبور (زار المنطقة 1761م لاستكشافها) • باكنجهام الرحالة والصحفي الإنجليزي (1816م: «الكويت مستقلة…») • لوشر الأمريكي (1868م: متطورة ونظيفة، 15–20 ألف نسمة) • روبرت تيلور (تقرير 1818م عن العتوب) • فرانسيس واردن (مقالة 1819م) • ج.ج. لوريمر (دليل الخليج) • لويس بيلي (بوشهر، زار 1863 و1865م) • هارولد ديكسون (الكويت وجاراتها، عرب الصحراء)." }] },
+    { id: "open-gulf", lesson: 2, variants: [{ open: "وضّح أهمية الخليج العربي الحضارية والتجارية.",
+      model: "يتوسط الخليج قارات العالم القديم (آسيا وأفريقيا وأوروبا) وهو قريب من أقدم الحضارات؛ شكّل رافداً حضارياً للتبادل الثقافي والتجاري بين الحضارات (بلاد النهرين شمالاً، والعيلامية والميدية وفارس شرقاً)، وكان وسيلة الاتصال الأهم بين حضارات الهند والسند والصين وحضارات البحر المتوسط وأوروبا، مباشرة عبر مياهه أو غير مباشرة عبر سكان سواحله." }] },
+    { id: "open-location", lesson: 2, variants: [{ open: "اذكر أسباب تميّز موقع الكويت الجغرافي.",
+      model: "1) النهاية الطبيعية للطريق الملاحي والتجاري على طريق الهند والشرق الأقصى. 2) مركز تجاري للوافدين من نجد والإحساء وبادية الشام وتصريف بضائعهم. 3) منطقة تجارة عبور (ترانزيت) قليلة الضرائب. 4) فيها أحد أهم الموانئ ونشاط بحري وتجاري كبير. 5) تميّز الكويتيين في نقل التجارة بين موانئ الخليج وسواحل الهند والشرق الأفريقي." }] },
+    { id: "open-arabness", lesson: 2, variants: [{ open: "تحدث عن إشكالية تسمية الخليج، وما الذي يؤكد عروبته؟",
+      model: "سُمّي البحر الأدنى وبحر الشروق الكبير، والإغريق أول من أطلق «الخليج الفارسي»، والرومان أطلقوا «الخليج العربي» في القرن الأول الميلادي، وفي العهد الإسلامي سُمّي «بحر العرب». والواقع الجغرافي والتاريخي وطبيعة السكان العرب على شواطئه الشمالية والشرقية والغربية منذ القدم يؤكد أنه عربي الأصل والنشأة." }] },
+    { id: "open-antiquity", lesson: 2, variants: [{ open: "ما الأدلة الأثرية على قدم الاستيطان في أرض الكويت؟",
+      model: "بعثة أرهوس الدنماركية (1958م) وجدت في فيلكا آثاراً أقدم من العصر الهلنستي (تل سعد ف3، دار الضيافة ف4، تل سعيد ف5، قصر الحاكم، القلعة الهلنستية)، وحجر يوناني باسم «إيكاروس». موقع الصبية (بعثة كويتية–بريطانية 1998م ثم كويتية–بولندية 2007م) مرتبط بحضارة العبيد 5500–3500 ق.م. تل عكاز شمال غرب ميناء الشويخ. كاظمة: ازدهار الميناء من منتصف القرن 6 حتى نهاية القرن 7 م ومحطة على طريق التجارة والحج." }] },
+    { id: "open-fureiha", lesson: 3, variants: [{ open: "ما أهمية استقرار العتوب في الفريحة بقطر؟",
+      model: "التحول من البداوة إلى الاستقرار والتوجه للبحر والتجارة البحرية • إتقان المهن البحرية وخاصة الغوص على اللؤلؤ • التنقل بين موانئ الخليج والطرق التجارية • التعاون التجاري مع البحرين • التعرف على الطرق البحرية بين الهند وجنوب البصرة والأوضاع السياسية • التعرف على طبيعة المنطقة والأماكن الصالحة للاستقرار." }] },
+    { id: "open-haddar", lesson: 3, variants: [{ open: "من هم العتوب؟ ولماذا هاجروا من الهدّار حسب آراء المؤرخين؟",
+      model: "العتوب عشائر وأسر يرجع أغلبها إلى قبيلة عنزة، ومساكنهم في الأفلاج (الهدّار قرب وادي الدواسر)، وأشهرهم آل الصباح وآل خليفة والجلاهمة. الرشيد: نزاعات وخلافات قبلية مع الدواسر، وربما الضغوط القبلية أو كبر نفوسهم وطموحهم. الشملان: فتن بين الدواسر وآل خليفة وآل صباح." }] },
+    { id: "open-qatar", lesson: 3, variants: [{ open: "لماذا رحل العتوب من قطر؟ وماذا حدث بعد رحيلهم؟",
+      model: "ظهرت مخاوف من أهالي المنطقة وآل مسلم حكام قطر، وقتل أحد العتوب رجلاً قطرياً سمع منه استهزاءً وسخرية؛ فرحلوا، ولحقهم آل مسلم بسفن ودارت معركة رأس تنورة وانتصر العتوب، ثم استمروا في الرحيل بحثاً عن وطن جديد." }] },
+    { id: "open-name", lesson: 3, variants: [{ open: "تحدث عن أصل تسمية الكويت (الكوت والقرين).",
+      model: "شبه إجماع على أن «كويت» تصغير «كوت» أي القلعة أو الحصن. الكرملي (1904م): مشتقة من الكوت، البيت المبني كالقلعة ليسهل الدفاع عنه. الرشيد: الكوت المكان القريب من الماء، وبانيه محمد لصكة بن عريعر مستودعاً للذخيرة والسلاح (وقيل عقيل أو براك بن عريعر). أبو حاكمة: الاسم القديم في المصادر الغربية «القرين» مستدلاً بخريطة نيبور. ظل الاسمان الكوت والقرين مستخدمين ثم عُرفت باسم الكويت." }] },
+    { id: "open-banikhalid", lesson: 3, variants: [{ open: "وضّح علاقة العتوب ببني خالد، وأسباب سماحهم للعتوب بالاستقرار في الكويت.",
+      model: "امتد نفوذ بني خالد حتى البصرة، ولم تكن الكويت ضمن ولاية البصرة بل ضمن الحدود الشمالية لإمارة الإحساء أهم معاقلهم. أسباب السماح: ربما محاولة إشراك العتوب معهم في صراعاتهم ضد العثمانيين، وأن الكويت لم تكن قد برزت أهميتها التجارية والاقتصادية بعد. العلاقة فترتان: هدوء وسلم، ثم تجاذب وتوتر." }] },
+    // ---------- Lesson 1 ----------
+    { id: "oral", lesson: 1, explain: "في الربع الأول من القرن العشرين خلا التاريخ المحلي من المؤلفات، وكان الاعتماد على الرواية الشفوية المتناقلة في المجالس والدواوين.",
+      variants: [
+        { q: "على ماذا اعتمد تناقل تاريخ الكويت في الربع الأول من القرن العشرين؟", a: "الرواية الشفوية", wrong: ["المؤلفات المحلية المطبوعة", "الوثائق العثمانية", "الصحف الكويتية"] },
+        { short: true, q: "أين كانت تُتناقل الرواية الشفوية لتاريخ الكويت؟", a: "المجالس والدواوين", wrong: ["المدارس النظامية", "الصحف والمجلات", "الأسواق والموانئ"] },
+        { tf: "في الربع الأول من القرن العشرين كان الاعتماد بشكل رئيسي على الرواية الشفوية في تناقل التاريخ الكويتي.", answer: true },
+        { tf: "شهد الربع الأول من القرن العشرين صدور مؤلفات محلية كثيرة عن تاريخ الكويت.", answer: false },
+      ] },
+    { id: "historywriting", lesson: 1, explain: "كتابة التاريخ مهما بلغت من الإتقان تظل مرتبطة بوعي وتصورات مؤلفيها، عاكسة لتدخل المؤرخ ومعالجته للحدث أو النص.",
+      variants: [
+        { q: "كتابة التاريخ، مهما بلغت من الإتقان، تظل مرتبطة بـ:", a: "وعي وتصورات مؤلفيها", wrong: ["الوثائق الرسمية فقط", "رغبة الحكام", "الروايات الأجنبية"] },
+      ] },
+    { id: "committeewhy", lesson: 1, explain: "في نهاية الخمسينيات ظهرت الحاجة إلى مؤلَّف تاريخي يبرز أهمية الكويت ودورها ويساعد على التصدي للتحديات والادعاءات، فشُكّلت اللجنة عام 1959م.",
+      variants: [
+        { q: "ما الدافع إلى تشكيل لجنة كتابة تاريخ الكويت؟", a: "الحاجة إلى مؤلَّف يبرز أهمية الكويت ودورها ويتصدى للتحديات والادعاءات", wrong: ["تعليم الطلاب في المدارس", "ترجمة الكتب الغربية إلى العربية", "جمع الشعر الشعبي"] },
+        { q: "متى ظهرت الحاجة إلى كتابة تاريخ رسمي للكويت؟", a: "نهاية الخمسينيات", wrong: ["بداية العشرينيات", "نهاية الثلاثينيات", "منتصف الستينيات"] },
+      ] },
+    { id: "committeeproposer", lesson: 1, explain: "شُكّلت اللجنة بعد مقترح من الشيخ صباح الأحمد الصباح، رئيس دائرة المطبوعات والنشر آنذاك.",
+      variants: [
+        { short: true, accept: ["صباح الاحمد"], q: "بمقترح ممن شُكّلت لجنة كتابة تاريخ الكويت عام 1959م؟", a: "الشيخ صباح الأحمد الصباح", wrong: ["الشيخ أحمد الجابر الصباح", "الشيخ عبد الله السالم الصباح", "عبد العزيز الرشيد"] },
+        { short: true, q: "ما المنصب الذي كان يشغله الشيخ صباح الأحمد عند اقتراحه تشكيل اللجنة؟", a: "رئيس دائرة المطبوعات والنشر", wrong: ["وزير الخارجية", "رئيس دائرة المعارف", "حاكم الكويت"] },
+        { q: "الشيخ صباح الأحمد الصباح (رئيس دائرة المطبوعات والنشر) اقترح:", a: "تشكيل لجنة كتابة تاريخ الكويت", wrong: ["طباعة كتاب الرشيد", "دعوة بعثة أرهوس الدنماركية", "ترجمة دليل الخليج"] },
+      ] },
+    { id: "committeenat", lesson: 1, explain: "ضمّت اللجنة الأكاديميين العراقيين د. عبد العزيز الدوري وصالح العلي، ود. أحمد مصطفى أبو حاكمة من فلسطين، وحسين خزعل.",
+      variants: [
+        { short: true, accept: ["ابو حاكمة"], q: "من عضو لجنة كتابة تاريخ الكويت القادم من فلسطين؟", a: "أحمد مصطفى أبو حاكمة", wrong: ["عبد العزيز الدوري", "صالح العلي", "حسين خزعل"] },
+        { q: "ما جنسية الأكاديميَّين عبد العزيز الدوري وصالح العلي؟", a: "عراقيان", wrong: ["فلسطينيان", "مصريان", "كويتيان"] },
+        { short: true, q: "أحمد مصطفى أبو حاكمة، عضو لجنة كتابة تاريخ الكويت، من:", a: "فلسطين", wrong: ["العراق", "مصر", "سوريا"] },
+      ] },
+    { id: "khazalparts", lesson: 1, explain: "«تاريخ الكويت السياسي» لحسين خزعل يتكون من خمسة أجزاء، صدر أولها عام 1962م.",
+      variants: [
+        { short: true, accept: ["5", "خمسه", "خمس"], q: "كم جزءاً يتكون كتاب «تاريخ الكويت السياسي» لحسين خزعل؟", a: "خمسة أجزاء", wrong: ["ثلاثة أجزاء", "جزءان", "سبعة أجزاء"] },
+      ] },
+    { id: "lorimerpurpose", lesson: 1, explain: "كتب لوريمر «سجل الأحداث في الخليج وعمان ووسط الجزيرة» (دليل الخليج) لكي يتعرف المبعوثون الرسميون البريطانيون على أحوال الخليج وطبيعته.",
+      variants: [
+        { short: true, q: "بأي اسم عُرف كتاب لوريمر لاحقاً؟", a: "دليل الخليج", wrong: ["الكويت وجاراتها", "عرب الصحراء", "وصف شبه جزيرة العرب"] },
+        { q: "لماذا كتب لوريمر «دليل الخليج»؟", a: "ليتعرف المبعوثون الرسميون البريطانيون على أحوال الخليج وطبيعته", wrong: ["لتعليم أبناء المدارس تاريخ الكويت", "للرد على الادعاءات ضد الكويت", "لوصف رحلته الاستكشافية عام 1761م"] },
+        { q: "يُعتبر «دليل الخليج» موسوعة:", a: "تاريخية وجغرافية وإحصائية", wrong: ["أدبية وشعرية", "دينية وفقهية", "عسكرية فقط"] },
+      ] },
+    { id: "lusherpop", lesson: 1, explain: "قدّر لوشر (1868م) سكان الكويت بما يتراوح بين 15 و20 ألف نسمة.",
+      variants: [
+        { q: "بكم قدّر الرحالة لوشر عدد سكان الكويت عام 1868م؟", a: "بين 15 و20 ألف نسمة", wrong: ["بين 5 و10 آلاف نسمة", "بين 30 و40 ألف نسمة", "نحو 100 ألف نسمة"] },
+      ] },
+    { id: "qenaeipurpose", lesson: 1, explain: "«صفحات من تاريخ الكويت» للقناعي موجز مبسط لأبناء المدارس ليعرفوا تاريخ آبائهم وأسلافهم.",
+      variants: [
+        { q: "لمن وُجّه كتاب «صفحات من تاريخ الكويت» كموجز مبسط؟", a: "لأبناء المدارس", wrong: ["للمبعوثين البريطانيين", "للباحثين الأكاديميين", "لحكام الخليج"] },
+      ] },
+
+    // ---------- Lesson 2 ----------
+    { id: "gulfimportance", lesson: 2, explain: "يمتلك الخليج أهمية كبرى لموقعه الاستراتيجي الذي يتوسط قارات العالم القديم ولقربه من أقدم الحضارات الإنسانية.",
+      variants: [
+        { q: "لماذا يمتلك الخليج العربي أهمية كبرى؟", a: "لموقعه الذي يتوسط قارات العالم القديم وقربه من أقدم الحضارات", wrong: ["لأنه أكبر بحار العالم", "لاحتوائه على أكبر الأنهار", "لبعده عن مراكز الحضارات"] },
+        { q: "لا يمكن فهم تاريخ أية منطقة دون دراسة:", a: "الموقع الجغرافي والبيئة الطبيعية", wrong: ["اللغة المحلية فقط", "الأنظمة الاقتصادية الحديثة", "الأدب والشعر"] },
+      ] },
+    { id: "firstpersian", lesson: 2, explain: "يُعتبر الإغريق أول من أطلق اسم «الخليج الفارسي»، وأطلق الرومان في القرن الأول الميلادي اسم «الخليج العربي».",
+      variants: [
+        { short: true, accept: ["اليونان"], q: "من أول من أطلق اسم «الخليج الفارسي»؟", a: "الإغريق", wrong: ["الرومان", "الفرس", "البريطانيون"] },
+        { q: "في أي قرن أطلق الرومان اسم «الخليج العربي»؟", a: "القرن الأول الميلادي", wrong: ["القرن الثالث قبل الميلاد", "القرن السابع الميلادي", "القرن الخامس الميلادي"] },
+        { tf: "الرومان هم أول من أطلق اسم «الخليج الفارسي».", answer: false },
+      ] },
+    { id: "arabness", lesson: 2, explain: "الواقع الجغرافي والتاريخي وطبيعة السكان العرب على شواطئه الشمالية والشرقية والغربية منذ القدم تؤكد أن الخليج عربي الأصل والنشأة.",
+      variants: [
+        { q: "ما الذي يؤكد أن الخليج عربي الأصل والنشأة؟", a: "الواقع الجغرافي والتاريخي وطبيعة السكان العرب على شواطئه", wrong: ["تسمية الإغريق له", "وجود النفط فيه", "افتتاح قناة السويس"] },
+        { q: "عاش السكان العرب منذ القدم على شواطئ الخليج:", a: "الشمالية والشرقية والغربية", wrong: ["الغربية فقط", "الجنوبية فقط", "الشرقية فقط"] },
+      ] },
+    { id: "northciv", lesson: 2, explain: "إلى الشمال من الخليج حضارة بلاد النهرين، ومن الشرق ثلاث حضارات: العيلامية والميدية وفارس.",
+      variants: [
+        { short: true, accept: ["بلاد الرافدين", "الرافدين", "النهرين"], q: "ما الحضارة التي تقع إلى الشمال من الخليج العربي؟", a: "حضارة بلاد النهرين", wrong: ["الحضارة العيلامية", "الحضارة الميدية", "الحضارة الفرعونية"] },
+        { q: "كم حضارة أساسية احتوى عليها الخليج من ناحية الشرق؟", a: "ثلاث", wrong: ["اثنتان", "أربع", "خمس"] },
+      ] },
+    { id: "gulflink", lesson: 2, explain: "كان الخليج وسيلة الاتصال الأهم بين حضارات الهند والسند والصين وحضارات البحر المتوسط وأوروبا، مباشرة عبر مياهه أو غير مباشرة عبر سكان سواحله.",
+      variants: [
+        { q: "كان الخليج العربي وسيلة الاتصال الأهم بين حضارات الهند والسند والصين وبين:", a: "حضارات البحر المتوسط وأوروبا", wrong: ["حضارات أمريكا", "حضارات أفريقيا الجنوبية", "حضارات آسيا الوسطى فقط"] },
+        { q: "كيف ربط الخليج الحضارات بشكل غير مباشر؟", a: "عبر سكان سواحله", wrong: ["عبر الطرق البرية الصحراوية", "عبر قناة السويس", "عبر الأنهار"] },
+      ] },
+    { id: "suez", lesson: 2, explain: "بعد افتتاح قناة السويس 1869م تراجع النشاط البحري في الخليج، ثم عاد بعد اكتشاف النفط معتمداً بشكل رئيسي على نقل النفط.",
+      variants: [
+        { q: "ما أثر افتتاح قناة السويس عام 1869م على الخليج العربي؟", a: "تراجع الازدهار والنشاط البحري فيه", wrong: ["ازدهار النشاط البحري", "اكتشاف النفط", "زيادة عدد السكان"] },
+        { short: true, accept: ["النفط"], q: "ما الذي أعاد النشاط البحري إلى الخليج بعد تراجعه؟", a: "اكتشاف النفط", wrong: ["افتتاح قناة السويس", "تجارة اللؤلؤ", "صناعة السفن"] },
+        { tf: "بعد افتتاح قناة السويس ازدهر النشاط البحري في الخليج العربي.", answer: false },
+      ] },
+    { id: "oil", lesson: 2, explain: "شهدت الكويت عام 1946م احتفالاً بتصدير أول شحنة من النفط الكويتي بحضور الحاكم الشيخ أحمد الجابر الصباح.",
+      variants: [
+        { short: true, accept: ["احمد الجابر"], q: "بحضور من احتُفل بتصدير أول شحنة من النفط الكويتي؟", a: "الشيخ أحمد الجابر الصباح", wrong: ["الشيخ عبد الله السالم الصباح", "الشيخ صباح الأحمد الصباح", "الشيخ مبارك الصباح"] },
+        { q: "الشيخ أحمد الجابر الصباح حضر عام 1946م:", a: "الاحتفال بتصدير أول شحنة نفط كويتي", wrong: ["افتتاح قناة السويس", "تشكيل لجنة كتابة التاريخ", "بدء بعثة أرهوس"] },
+      ] },
+    { id: "coords", lesson: 2, explain: "تقع الكويت على جون في الركن الشمالي الغربي (من الخليج) بين خطي طول 46–49 شرقاً ودائرتي عرض 28–30 شمالاً.",
+      variants: [
+        { q: "بين أي خطي طول تقع الكويت؟", a: "46 – 49 شرقاً", wrong: ["28 – 30 شرقاً", "50 – 54 شرقاً", "40 – 44 شرقاً"] },
+        { q: "بين أي دائرتي عرض تقع الكويت؟", a: "28 – 30 شمالاً", wrong: ["46 – 49 شمالاً", "20 – 24 شمالاً", "32 – 35 شمالاً"] },
+        { q: "تقع الكويت على جَون في الركن:", a: "الشمالي الغربي", wrong: ["الجنوبي الشرقي", "الشمالي الشرقي", "الجنوبي الغربي"] },
+        { q: "خطا الطول 46–49 شرقاً ودائرتا العرض 28–30 شمالاً هي إحداثيات:", a: "الكويت", wrong: ["جزيرة فيلكا فقط", "قطر", "البحرين"] },
+      ] },
+    { id: "borders", lesson: 2, explain: "يحد الكويت شمالاً العراق، ومن الجنوب والغرب السعودية، ومن الشرق الخليج العربي.",
+      variants: [
+        { short: true, q: "ما الذي يحد الكويت من الشمال؟", a: "العراق", wrong: ["المملكة العربية السعودية", "الخليج العربي", "إيران"] },
+        { short: true, accept: ["السعودية"], q: "ما الذي يحد الكويت من الجنوب والغرب؟", a: "المملكة العربية السعودية", wrong: ["العراق", "الخليج العربي", "قطر"] },
+        { short: true, q: "ما الذي يحد الكويت من الشرق؟", a: "الخليج العربي", wrong: ["العراق", "المملكة العربية السعودية", "إيران"] },
+      ] },
+    { id: "gateway", lesson: 2, explain: "تمثل الكويت بوابة ومدخلاً طبيعياً لشمال شرق الجزيرة العربية.",
+      variants: [
+        { q: "تمثل الكويت بوابة ومدخلاً طبيعياً لـ:", a: "شمال شرق الجزيرة العربية", wrong: ["جنوب غرب الجزيرة العربية", "بلاد الشام", "شرق أفريقيا"] },
+      ] },
+    { id: "ikaros", lesson: 2, explain: "وردت فيلكا باسم «إيكاروس» في النصوص اليونانية، وأكد ذلك حجر منقوش بالكتابة اليونانية اكتشفته البعثة الدنماركية في القلعة الهلنستية (تل سعيد – ف 5).",
+      variants: [
+        { short: true, accept: ["ايكاروس"], q: "ما اسم جزيرة فيلكا في النصوص اليونانية؟", a: "إيكاروس", wrong: ["دلمون", "تايلوس", "كاظمة"] },
+        { q: "ما الذي أكد تسمية فيلكا «إيكاروس»؟", a: "حجر منقوش بالكتابة اليونانية في القلعة الهلنستية", wrong: ["خريطة نيبور", "تقرير روبرت تيلور", "كتاب دليل الخليج"] },
+        { q: "أي بعثة اكتشفت الحجر المنقوش باسم «إيكاروس»؟", a: "البعثة الدنماركية", wrong: ["البعثة الفرنسية", "البعثة الكويتية–البولندية", "البعثة الكويتية–البريطانية"] },
+      ] },
+    { id: "hellenistic", lesson: 2, explain: "اكتشفت البعثتان الدنماركية والفرنسية في تل سعيد (ف 5) بقايا قلعة هلنستية تعود للقرن الثالث قبل الميلاد.",
+      variants: [
+        { q: "إلى أي قرن تعود القلعة الهلنستية في تل سعيد؟", a: "القرن الثالث قبل الميلاد", wrong: ["القرن الأول الميلادي", "القرن السادس الميلادي", "القرن الخامس قبل الميلاد"] },
+        { q: "أي بعثتين اكتشفتا بقايا القلعة الهلنستية في تل سعيد؟", a: "الدنماركية والفرنسية", wrong: ["البريطانية والبولندية", "الدنماركية والبولندية", "الفرنسية والبريطانية"] },
+        { q: "دلّت اكتشافات بعثة أرهوس على وجود آثار تعود لفترات:", a: "أقدم من العصر الهلنستي", wrong: ["أحدث من العصر الإسلامي", "العصر العثماني فقط", "القرن التاسع عشر"] },
+      ] },
+    { id: "ubaid", lesson: 2, explain: "يرتبط موقع الصبية بحضارة العُبيد التي تؤرخ بالفترة 5500–3500 ق.م.",
+      variants: [
+        { short: true, accept: ["العبيد"], q: "بأي حضارة يرتبط موقع الصبية؟", a: "حضارة العُبيد", wrong: ["الحضارة الهلنستية", "حضارة دلمون", "الحضارة الميدية"] },
+        { q: "ما الفترة التي تؤرخ بها حضارة العُبيد؟", a: "5500 – 3500 ق.م", wrong: ["3500 – 1500 ق.م", "القرن الثالث ق.م", "633م"] },
+      ] },
+    { id: "dhatsalasil", lesson: 2, explain: "جرت موقعة ذات السلاسل على أرض الكويت عام 12هـ / 633م بين المسلمين بقيادة خالد بن الوليد والفرس، وانتصر المسلمون، وعُرفت أيضاً باسم «كاظمة».",
+      variants: [
+        { short: true, q: "ما الموقعة التي جرت على أرض الكويت عام 12هـ / 633م؟", a: "ذات السلاسل", wrong: ["القادسية", "اليرموك", "رأس تنورة"] },
+        { short: true, q: "من قاد المسلمين في موقعة ذات السلاسل؟", a: "خالد بن الوليد", wrong: ["سعد بن أبي وقاص", "عمرو بن العاص", "أبو عبيدة بن الجراح"] },
+        { q: "متى جرت موقعة ذات السلاسل؟", a: "12هـ / 633م", wrong: ["15هـ / 636م", "8هـ / 629م", "21هـ / 642م"] },
+        { short: true, q: "بأي اسم آخر عُرفت موقعة ذات السلاسل؟", a: "كاظمة", wrong: ["فيلكا", "الصبية", "عكاز"] },
+        { q: "بين من ومن دارت موقعة ذات السلاسل؟", a: "المسلمين والفرس", wrong: ["المسلمين والروم", "العتوب وآل مسلم", "العتوب وبني خالد"] },
+      ] },
+    { id: "conclusion2", lesson: 2, explain: "كل الدلائل والآثار لا تدع مجالاً للشك بأن الكويت سكنتها جماعات بشرية منذ القدم.",
+      variants: [
+        { tf: "تدل الآثار المكتشفة على أن أرض الكويت سكنتها جماعات بشرية منذ القدم.", answer: true },
+      ] },
+
+    // ---------- Lesson 3 ----------
+    { id: "authority", lesson: 3, explain: "بدون سلطة تظل المنطقة أو الدولة مفهوماً نظرياً، فالسلطة هي التي تبسط نفوذها وسيادتها على الأرض فيشعر السكان بالانقياد والانتماء.",
+      variants: [
+        { q: "بدون سلطة تظل المنطقة أو الدولة:", a: "مفهوماً نظرياً", wrong: ["دولة قوية", "مركزاً تجارياً", "إمارة مستقلة"] },
+      ] },
+    { id: "anaza", lesson: 3, explain: "العتوب مجموعة من العشائر أو الأسر ترجع أغلبها في أصولها إلى قبيلة عنزة.",
+      variants: [
+        { short: true, accept: ["عنزه"], q: "إلى أي قبيلة يرجع أغلب العتوب في أصولهم؟", a: "عنزة", wrong: ["بني خالد", "الدواسر", "شمّر"] },
+        { q: "من هم العتوب؟", a: "مجموعة من العشائر أو الأسر ترجع أغلبها إلى قبيلة عنزة", wrong: ["فرع من قبيلة بني خالد", "حكام قطر قديماً", "بحارة من الهند"] },
+      ] },
+    { id: "haddar", lesson: 3, explain: "كانت مساكن العتوب في الأفلاج، وتحديداً الهدّار قرب وادي الدواسر.",
+      variants: [
+        { q: "أين كانت مساكن العتوب الأصلية؟", a: "الأفلاج (الهدّار تحديداً)", wrong: ["الإحساء", "قطر", "البصرة"] },
+        { short: true, q: "الهدّار تقع قرب:", a: "وادي الدواسر", wrong: ["خور بوبيان", "الزبارة", "أم قصر"] },
+        { short: true, accept: ["الهدار", "الافلاج"], q: "ما الموطن الأصلي للعتوب الذي هاجروا منه أولاً؟", a: "الهدّار", wrong: ["الفريحة", "المخراق", "جزيرة قيس"] },
+      ] },
+    { id: "qatarroute", lesson: 3, explain: "لم تكن مسيرة العتوب إلى السواحل مباشرة؛ مروا بالإحساء ومنها انطلقوا إلى قطر فنزلوا قرية الفريحة التي كانت تحت حكم آل مسلم التابعين لبني خالد.",
+      variants: [
+        { short: true, accept: ["الاحساء", "الأحساء"], q: "ما المحطة التي انطلق منها العتوب إلى قطر؟", a: "الإحساء", wrong: ["البصرة", "الكويت", "البحرين"] },
+        { short: true, q: "في أي قرية نزل العتوب في قطر؟", a: "الفريحة", wrong: ["الزبارة", "الدوحة", "رأس تنورة"] },
+        { q: "من كان يحكم الفريحة عند نزول العتوب فيها؟", a: "آل مسلم التابعون لبني خالد", wrong: ["آل خليفة", "الدواسر", "الدولة العثمانية"] },
+        { short: true, q: "آل مسلم (حكام قطر آنذاك) كانوا تابعين لـ:", a: "بني خالد", wrong: ["الدولة العثمانية", "فارس", "عنزة"] },
+        { q: "الفريحة التي نزلها العتوب قريبة من:", a: "الزبارة", wrong: ["الإحساء", "أم قصر", "القطيف"] },
+        { tf: "اتجه العتوب من الهدّار إلى سواحل الخليج مباشرة دون المرور بمناطق أخرى.", answer: false },
+      ] },
+    { id: "qatarduration", lesson: 3, explain: "استقر العتوب في الفريحة ونواحيها فترة قُدّرت ما بين ثلاثين إلى خمسين عاماً.",
+      variants: [
+        { q: "كم استقر العتوب في قطر تقريباً؟", a: "ما بين 30 و50 عاماً", wrong: ["ما بين 5 و10 أعوام", "نحو 100 عام", "عاماً واحداً"] },
+      ] },
+    { id: "secondmigration", lesson: 3, explain: "رحل العتوب من قطر بعد ظهور مخاوف الأهالي وآل مسلم، وبسبب قتل أحد العتوب رجلاً قطرياً سمع منه استهزاءً وسخرية؛ فلحقهم آل مسلم ودارت معركة رأس تنورة وانتصر العتوب.",
+      variants: [
+        { short: true, accept: ["راس تنوره"], q: "ما المعركة التي دارت بين العتوب وآل مسلم بعد رحيلهم من قطر؟", a: "معركة رأس تنورة", wrong: ["ذات السلاسل", "كاظمة", "الزبارة"] },
+        { short: true, q: "من انتصر في معركة رأس تنورة؟", a: "العتوب", wrong: ["آل مسلم", "بنو خالد", "الدواسر"] },
+        { q: "ما الحادثة التي سبقت رحيل العتوب من قطر؟", a: "قتل أحد العتوب رجلاً قطرياً سمع منه استهزاءً وسخرية", wrong: ["اكتشاف النفط في قطر", "وفاة حاكم قطر", "غزو عثماني لقطر"] },
+        { q: "تُسمى رحلة العتوب من قطر:", a: "الهجرة الثانية", wrong: ["الهجرة الأولى", "الهجرة الثالثة", "رحلة الاستكشاف"] },
+        { tf: "انتصر آل مسلم على العتوب في معركة رأس تنورة.", answer: false },
+      ] },
+    { id: "kutbuilder", lesson: 3, explain: "يرى الرشيد أن باني الكوت محمد لصكة بن عريعر (مستودعاً للذخيرة والسلاح)، ويرى آخرون أنه عقيل بن عريعر أو براك بن عريعر.",
+      variants: [
+        { short: true, accept: ["محمد بن عريعر"], q: "حسب الرشيد، من بنى الكوت؟", a: "محمد لصكة بن عريعر", wrong: ["عقيل بن عريعر", "براك بن عريعر", "صباح الأول"] },
+        { q: "لماذا بُني الكوت حسب الرشيد؟", a: "ليكون مستودعاً للذخيرة والسلاح", wrong: ["ليكون مسكناً للحاكم", "ليكون سوقاً تجارياً", "ليكون مسجداً"] },
+        { q: "أي مما يلي ليس من الآراء في باني الكوت؟", a: "صباح بن جابر", wrong: ["محمد لصكة بن عريعر", "عقيل بن عريعر", "براك بن عريعر"] },
+      ] },
+    { id: "kuwaitword", lesson: 3, explain: "شبه إجماع بين المؤرخين على أن «كويت» تصغير لكلمة «كوت» التي تعني القلعة أو الحصن.",
+      variants: [
+        { short: true, q: "كلمة «كويت» هي تصغير لكلمة:", a: "كوت", wrong: ["كاظمة", "قرين", "كوع"] },
+        { short: true, accept: ["القلعه", "الحصن"], q: "ماذا تعني كلمة «كوت» كما هو شائع؟", a: "القلعة أو الحصن", wrong: ["الميناء الصغير", "الصحراء", "الجزيرة"] },
+        { short: true, q: "ما الاسم القديم للكويت الذي يظهر على خريطة نيبور؟", a: "القرين", wrong: ["كاظمة", "إيكاروس", "الكوت"] },
+        { short: true, q: "متى كتب الأب أنستاس الكرملي مقاله عن أصل اسم الكويت؟", a: "1904م", wrong: ["1816م", "1926م", "1868م"] },
+      ] },
+    { id: "banikhalidinfluence", lesson: 3, explain: "كان نفوذ بني خالد يمتد حتى البصرة شمالاً؛ ولم تكن الكويت ضمن ولاية البصرة بل ضمن الحدود الشمالية لإمارة الإحساء أهم معاقل بني خالد.",
+      variants: [
+        { short: true, accept: ["البصرة"], q: "إلى أين امتد نفوذ بني خالد شمالاً؟", a: "حتى البصرة", wrong: ["حتى بغداد", "حتى الشام", "حتى الهدّار"] },
+        { q: "ضمن أي حدود كانت منطقة الكوت/القرين قبل استقرار العتوب؟", a: "الحدود الشمالية لإمارة الإحساء", wrong: ["ولاية البصرة", "ولاية بغداد", "حكم آل مسلم في قطر"] },
+        { short: true, accept: ["الاحساء", "الإحساء"], q: "ما أهم معاقل بني خالد؟", a: "إمارة الإحساء", wrong: ["البصرة", "قطر", "الكويت"] },
+        { tf: "كانت منطقة الكويت ضمن حدود ولاية البصرة قبل استقرار العتوب.", answer: false },
+      ] },
+    { id: "banikhalidrelation", lesson: 3, explain: "انقسمت العلاقة بين العتوب وبني خالد إلى فترتين: الأولى هدوء وسلم، والثانية تجاذب وتوتر.",
+      variants: [
+        { q: "كيف كانت الفترة الأولى من العلاقة بين العتوب وبني خالد؟", a: "فترة هدوء وسلم", wrong: ["فترة تجاذب وتوتر", "فترة حرب مستمرة", "فترة تبعية كاملة"] },
+        { q: "كيف كانت الفترة الثانية من العلاقة بين العتوب وبني خالد؟", a: "فترة تجاذب وتوتر", wrong: ["فترة هدوء وسلم", "فترة تحالف عسكري", "فترة وحدة سياسية"] },
+        { q: "انقسمت العلاقة بين العتوب وبني خالد إلى:", a: "فترتين", wrong: ["ثلاث فترات", "فترة واحدة", "أربع فترات"] },
+      ] },
+    { id: "bubiyan", lesson: 3, explain: "ذكر لويس بيلي أن أول الشيوخ أقبل عبر خور بوبيان وحطّ الرحال على خليج الكويت أو القرين.",
+      variants: [
+        { short: true, accept: ["بوبيان"], q: "حسب لويس بيلي، عبر أي خور أقبل أول الشيوخ إلى الكويت؟", a: "خور بوبيان", wrong: ["خور الصبية", "خور عبد الله", "المخراق"] },
+        { q: "من أين استأذن العتوب قبل الاتجاه إلى الكويت (حسب الرشيد)؟", a: "من بني خالد", wrong: ["من آل مسلم", "من الدولة العثمانية", "من الدواسر"] },
+      ] },
+  ],
+};
+// Supplementary question bank: covers every line of lessons 1–2 in many styles.
+// Loaded after practice-data.js; only appends to window.DECK.
+(function () {
+  const D = window.DECK;
+  const pick = (a, n) => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a.slice(0, n); };
+  const num = (v) => { const m = String(v).match(/\d+/); return m ? +m[0] : NaN; };
+  const M = (q, a, wrong, o) => Object.assign({ q, a, wrong }, o);          // multiple choice
+  const S = (q, a, wrong, accept) => ({ q, a, wrong, short: true, accept }); // also asked as typed answer
+  const T = (q, answer) => ({ tf: q, answer });                              // true / false
+  const I = (id, lesson, explain, variants) => D.items.push({ id, lesson, explain, variants });
+  const L = (id, lesson, label, members, distractors) => D.lists.push({ id, lesson, label, members, distractors });
+
+  D.activeLessons = [1, 2];   // the quiz covers chapters 1 and 2 only
+
+  // ---------- extra templates on existing tables ----------
+  const tbl = (id) => D.tables.find((t) => t.id === id);
+  tbl("books").templates.push(
+    { ask: "author", q: "«{title}» (صدر عام {year}م): من مؤلفه؟", short: true },
+    { ask: "year", q: "أكمل: صدر كتاب «{title}» لمؤلفه {author} عام ........ م", short: true },
+    { ask: "title", q: "أكمل: صدر عام {year}م كتاب «........» لمؤلفه {author}." },
+    { ask: "year", q: "ألّف {author} كتاب «{title}». في أي عام صدر؟", short: true },
+    { tf: "author", q: "من المؤلفين الذين ألّفوا عن تاريخ الكويت: {author}، وكتابه «{title}»." },
+  );
+  tbl("westerners").templates.push(
+    { tf: "person", q: "«{person}» — {deed}." },
+    { ask: "person", q: "{role}، ارتبط اسمه بالكويت عام {year}م. من هو؟" },
+    { ask: "role", q: "ما صفة الشخص الذي {deed}؟" },
+    { ask: "year", q: "في أي عام ارتبط «{person}» بالكويت؟ ({role})", short: true },
+  );
+  tbl("timeline").templates.push(
+    { ask: "year", q: "أكمل بالسنة: {event} عام ........ م", short: true },
+    { ask: "year", q: "أي عام ارتبط بالحدث التالي: {event}؟" },
+  );
+  tbl("sites").templates.push(
+    { ask: "site", q: "أي المواقع التالية يُنسب إليه الوصف: «{fact}»؟" },
+    { ask: "fact", q: "أي عبارة تصف موقع «{site}» وصفاً صحيحاً؟" },
+  );
+  tbl("failakacodes").templates.push({ tf: "code", q: "رمز «{tell}» في جزيرة فيلكا هو ({code})." });
+  tbl("missions").templates.push(
+    { tf: "year", q: "بدأت {mission} أعمالها عام {year}م." },
+    { tf: "site", q: "عملت {mission} في {site}." },
+  );
+
+  // ---------- LISTS ----------
+  L("objectives", 1, "أهداف محاضرات الدرسين الأول والثاني",
+    ["التعرف على مراحل تناقل وتدوين التاريخ الكويتي الحديث", "المصادر الغربية لتاريخ الكويت", "ملامح الخليج العربي ومميزات موقعه الحضاري والجغرافي", "مميزات موقع الكويت الجغرافي", "آثار التاريخ القديم والإسلامي في الأراضي الكويتية"],
+    ["تاريخ الكويت الاقتصادي بعد النفط", "نظام الحكم الدستوري في الكويت", "الغزو العراقي وتحرير الكويت", "الحياة الاجتماعية في الكويت المعاصرة"]);
+  L("localbooks", 1, "الكتب المحلية التي أُلّفت عن تاريخ الكويت (حسب الدرس الأول)",
+    ["«تاريخ الكويت» للرشيد", "«صفحات من تاريخ الكويت» للقناعي", "«مِن تاريخ الكويت» للشملان", "«تاريخ الكويت السياسي» لخزعل", "«تاريخ الكويت – الجزء الأول» لجنة تاريخ الكويت (أبو حاكمة)"],
+    ["«دليل الخليج» للوريمر", "«الكويت وجاراتها» لديكسون", "«عرب الصحراء» لديكسون", "«الكويت بعيون غربية» لنيبور"]);
+  L("westernwriters", 1, "الغربيين الذين كتبوا عن الكويت (حسب الدرس الأول)",
+    ["كارستن نيبور", "باكنجهام", "لوشر", "روبرت تيلور", "فرانسيس واردن", "ج. ج. لوريمر", "هارفرد جونز بريدجز", "لويس بيلي", "هارولد ديكسون"],
+    ["عبد العزيز الرشيد", "يوسف بن عيسى القناعي", "سيف مرزوق الشملان", "حسين خزعل", "أحمد مصطفى أبو حاكمة"]);
+  L("localwriters", 1, "مؤلفي المصادر المحلية لتاريخ الكويت (الدرس الأول)",
+    ["عبد العزيز الرشيد", "يوسف بن عيسى القناعي", "سيف مرزوق الشملان", "حسين خزعل", "أحمد مصطفى أبو حاكمة"],
+    ["كارستن نيبور", "لوشر", "لويس بيلي", "هارولد ديكسون", "ج. ج. لوريمر"]);
+  L("dicksonbooks", 1, "مؤلفات هارولد ديكسون",
+    ["«الكويت وجاراتها»", "«عرب الصحراء»"],
+    ["«دليل الخليج»", "«صفحات من تاريخ الكويت»", "«سجل الأحداث في الخليج وعمان ووسط الجزيرة»", "«تاريخ الكويت السياسي»"]);
+  L("gulfcivs", 2, "الحضارات الكبرى القائمة بجوار الخليج العربي أو على ضفافه",
+    ["حضارة بلاد النهرين (شمالاً)", "الحضارة العيلامية", "الحضارة الميدية", "الحضارة الفارسية"],
+    ["الحضارة الفرعونية (مصر)", "الحضارة الفينيقية", "الحضارة الرومانية", "حضارة المايا"]);
+  L("gulflinked", 2, "الحضارات التي ربطها الخليج العربي بحضارات المتوسط وأوروبا",
+    ["الهند", "السند", "الصين القديمة"],
+    ["بلاد النهرين", "العيلامية", "الميدية", "الفرعونية"]);
+  L("kuwaitneighbors", 2, "حدود الكويت الجغرافية",
+    ["العراق (شمالاً)", "المملكة العربية السعودية (جنوباً وغرباً)", "الخليج العربي (شرقاً)"],
+    ["إيران (شرقاً)", "الأردن (شمالاً)", "عُمان (جنوباً)", "قطر (جنوباً)"]);
+  L("kazimaevidence", 2, "مكتشفات موقع كاظمة",
+    ["آثار منشآت معمارية", "شقاف فخارية", "شقاف زجاجية"],
+    ["كتابات يونانية على الحجر", "مقابر فرعونية", "أدوات حجرية من العصر الحجري فقط", "عملات رومانية ذهبية"]);
+  L("gulfwayroutes", 2, "أدوار الخليج العربي الحضارية والتجارية",
+    ["رافد حضاري مهم", "وسيلة اتصال بين الحضارات القديمة", "تبادل ثقافي وتجاري بين الحضارات الكبرى", "اتصال مباشر عبر مياهه وغير مباشر عبر سكان سواحله"],
+    ["حاجز طبيعي يعزل الحضارات", "طريق للمواصلات الجوية", "مصدر وحيد للمياه العذبة", "منطقة خالية من التجارة"]);
+
+  // ---------- LESSON 1 ITEMS ----------
+  I("hw-intro", 1, "كتابة التاريخ مهما بلغت من الإتقان تظل مرتبطة بوعي وتصورات مؤلفيها، عاكسة لتدخل المؤرخ ومعالجته للحدث أو النص.", [
+    M("أي العبارات التالية صحيحة بشأن كتابة التاريخ؟", "تظل مرتبطة بوعي مؤلفيها وتصوراتهم مهما بلغت من الإتقان", ["تكون موضوعية تماماً ولا تتأثر بكاتبها", "لا علاقة لها بمعالجة المؤرخ للنص", "لا تعكس إلا الوثائق الرسمية"]),
+    M("تعكس كتابة التاريخ تدخل المؤرخ و:", "معالجته للحدث أو النص", ["اختياره لمكان النشر فقط", "عدد صفحات الكتاب", "لغة الطباعة"]),
+    M("أكمل: كتابة التاريخ، مهما بلغت من الإتقان، تظل مرتبطة بـ........ مؤلفيها.", "وعي وتصورات", ["أعمار", "جنسيات", "أماكن إقامة"]),
+    T("كتابة التاريخ مهما بلغت من الإتقان تظل مرتبطة بوعي وتصورات مؤلفيها.", true),
+    T("كتابة التاريخ لا تتأثر إطلاقاً بتصورات المؤلف أو معالجته للنص.", false),
+  ]);
+  I("hw-oral", 1, "خلا التاريخ الكويتي المحلي في الربع الأول من القرن العشرين من المؤلفات، وانصب الاعتماد على الرواية الشفوية المتناقلة في المجالس والدواوين.", [
+    M("أي العبارات التالية صحيحة عن الربع الأول من القرن العشرين في الكويت؟", "خلا من المؤلفات المحلية عن تاريخ الكويت", ["صدرت فيه موسوعات متعددة عن تاريخ الكويت", "اعتمد التاريخ فيه على الصحف اليومية", "كتبت فيه لجنة رسمية تاريخ الكويت"]),
+    M("أكمل: كان الاعتماد في تاريخ الكويت يَنصبّ على الرواية ........ التي تُتناقل في المجالس والدواوين.", "الشفوية", ["المكتوبة", "المطبوعة", "الرسمية"]),
+    M("المجالس والدواوين في الدرس الأول كانت وسيلة:", "تناقل الرواية الشفوية لتاريخ الكويت", ["طباعة الكتب التاريخية", "تدوين الوثائق الرسمية", "تدريس التاريخ للطلاب نظامياً"]),
+    M("أي مما يلي ليس من خصائص التاريخ الكويتي المحلي في الربع الأول من القرن العشرين؟", "وجود مؤلفات محلية موسّعة", ["الاعتماد على الرواية الشفوية", "التناقل عبر المجالس", "التناقل عبر الدواوين"]),
+    T("كانت المجالس والدواوين وسيلة لتناقل الرواية الشفوية لتاريخ الكويت.", true),
+    T("في الربع الأول من القرن العشرين كان تاريخ الكويت يُنقل بالمؤلفات المحلية المطبوعة في الأساس.", false),
+  ]);
+  I("rashid-full", 1, "كتاب «تاريخ الكويت» للشيخ عبد العزيز الرشيد (طُبع 1926م) أهم وأول كتاب محلي تناول تاريخ إمارة الكويت، وأول سجل مدوّن موسّع لتاريخ الإمارة منذ التأسيس وحتى الفترة التي عاصرها.", [
+    M("أي كتاب يُعد أهم وأول كتاب محلي تناول تاريخ إمارة الكويت؟", "«تاريخ الكويت» للرشيد", ["«صفحات من تاريخ الكويت» للقناعي", "«مِن تاريخ الكويت» للشملان", "«تاريخ الكويت السياسي» لخزعل"]),
+    M("أي كتاب يُعد أول سجل مدوّن لتاريخ الإمارة بشكل موسّع؟", "«تاريخ الكويت» للرشيد", ["«الكويت وجاراتها»", "«دليل الخليج»", "«صفحات من تاريخ الكويت»"]),
+    M("وصف الدرس عبد العزيز الرشيد بأنه:", "الأديب والمؤرخ الكويتي", ["الرحالة الإنجليزي", "المعتمد السياسي البريطاني", "الأكاديمي الفلسطيني"]),
+    M("تناول الرشيد في كتابه تاريخ الكويت من:", "التأسيس وحتى الفترة التي عاصرها", ["العصر الهلنستي حتى عام 1859", "فتح الكويت الإسلامي حتى النفط", "الاستقلال حتى اليوم"]),
+    S("ما سنة طباعة كتاب «تاريخ الكويت» للرشيد؟", "1926م", ["1946م", "1936م", "1959م"], ["1926"]),
+    T("كتاب الرشيد هو أول سجل مدوّن موسّع لتاريخ الإمارة.", true),
+    T("كتاب «تاريخ الكويت» للرشيد هو ثاني أهم كتاب محلي عن تاريخ الكويت.", false),
+    M("أي العبارات التالية عن كتاب الرشيد غير صحيحة؟", "طُبع عام 1946م", ["طُبع عام 1926م", "هو أول سجل مدوّن موسّع لتاريخ الإمارة", "تناول التاريخ منذ التأسيس"]),
+  ]);
+  I("qenaei-full", 1, "كتاب «صفحات من تاريخ الكويت» للشيخ يوسف بن عيسى القناعي ظهر عام 1946م كثاني أهم كتاب محلي، وهو موجز مبسط لأبناء المدارس.", [
+    M("أي كتاب ظهر عام 1946م كثاني أهم كتاب محلي كُتب عن تاريخ الكويت؟", "«صفحات من تاريخ الكويت»", ["«تاريخ الكويت»", "«مِن تاريخ الكويت»", "«تاريخ الكويت السياسي»"]),
+    M("ما ترتيب كتاب «صفحات من تاريخ الكويت» من حيث الأهمية بين الكتب المحلية؟", "ثاني أهم كتاب محلي", ["أول كتاب محلي", "ثالث كتاب محلي", "آخر الكتب المحلية"]),
+    M("ما طبيعة كتاب القناعي «صفحات من تاريخ الكويت»؟", "موجز مبسط", ["موسوعة جغرافية", "تقرير بريطاني رسمي", "كتاب في الأنساب فقط"]),
+    M("يتيح كتاب القناعي للطالب:", "معرفة بعض من تاريخ آبائه وأسلافه", ["دراسة تاريخ العصر الهلنستي", "معرفة أنظمة الحكم الأجنبية", "دراسة الاقتصاد النفطي"]),
+    M("أكمل: ظهر كتاب «صفحات من تاريخ الكويت» عام ........ كثاني أهم كتاب محلي.", "1946م", ["1926م", "1959م", "1962م"]),
+    T("كتاب القناعي «صفحات من تاريخ الكويت» موجز مبسط لأبناء المدارس.", true),
+    T("كتاب القناعي هو أول وأهم كتاب محلي عن تاريخ الكويت.", false),
+  ]);
+  I("shamlan-full", 1, "كتاب «مِن تاريخ الكويت» لسيف مرزوق الشملان صدر سنة 1959م وأضاف فصلاً مهماً من مراحل الكتابة التاريخية المدونة، ويتناول بشكل مركز مظاهر مختلفة من الجوانب السياسية للكويت.", [
+    M("أي كتاب صدر سنة 1959م لسيف مرزوق الشملان؟", "«مِن تاريخ الكويت»", ["«تاريخ الكويت»", "«صفحات من تاريخ الكويت»", "«تاريخ الكويت السياسي»"]),
+    M("بماذا تكمن أهمية كتاب «مِن تاريخ الكويت»؟", "يتناول بشكل مركز مظاهر مختلفة من الجوانب السياسية للكويت", ["يتناول الجوانب الجغرافية للخليج فقط", "يتناول أنساب القبائل فقط", "يرصد رحلات الغربيين"]),
+    M("أضاف كتاب الشملان لرصيد التاريخ الكويتي:", "فصلاً مهماً من مراحل الكتابة التاريخية المدونة", ["أول مؤلف مدوّن عن الكويت", "أول خريطة للخليج", "أول وثيقة أجنبية"]),
+    M("أي الجوانب يتناولها كتاب الشملان بشكل مركز؟", "الجوانب السياسية", ["الجوانب الاقتصادية فقط", "الجوانب الجغرافية فقط", "الجوانب الدينية فقط"]),
+    S("من مؤلف كتاب «مِن تاريخ الكويت» (1959م)؟", "سيف مرزوق الشملان", ["عبد العزيز الرشيد", "حسين خزعل", "أحمد أبو حاكمة"], ["الشملان"]),
+    T("يتناول كتاب الشملان بشكل مركز الجوانب السياسية للكويت.", true),
+    T("صدر كتاب «مِن تاريخ الكويت» عام 1926م.", false),
+  ]);
+  I("khazal-full", 1, "«تاريخ الكويت السياسي» لحسين خزعل من خمسة أجزاء، صدر الجزء الأول عام 1962م وتناول تاريخ الكويت بشكل موسّع من حيث التفاصيل والشخصيات.", [
+    M("أي كتاب يتكوّن من خمسة أجزاء ويتناول تاريخ الكويت بتوسع في التفاصيل والشخصيات؟", "«تاريخ الكويت السياسي»", ["«تاريخ الكويت» للرشيد", "«صفحات من تاريخ الكويت»", "«مِن تاريخ الكويت»"]),
+    M("متى صدر الجزء الأول من «تاريخ الكويت السياسي»؟", "1962م", ["1946م", "1959م", "1967م"]),
+    M("بماذا تميّز كتاب خزعل؟", "توسّعه في التفاصيل والشخصيات", ["اختصاره وتبسيطه لأبناء المدارس", "اقتصاره على المصادر الغربية", "اقتصاره على العصر الإسلامي"]),
+    M("أي العبارات التالية عن «تاريخ الكويت السياسي» غير صحيحة؟", "يتكوّن من جزء واحد", ["مؤلفه حسين خزعل", "يتكون من خمسة أجزاء", "صدر جزؤه الأول عام 1962م"]),
+    S("من مؤلف «تاريخ الكويت السياسي»؟", "حسين خزعل", ["أحمد مصطفى أبو حاكمة", "عبد العزيز الدوري", "صالح العلي"], ["خزعل"]),
+    T("كتاب «تاريخ الكويت السياسي» لحسين خزعل يتكون من خمسة أجزاء.", true),
+    T("صدر الجزء الأول من «تاريخ الكويت السياسي» عام 1959م.", false),
+  ]);
+  I("abuhakima-full", 1, "في عام 1965م قررت لجنة كتابة تاريخ الكويت الاستعانة بالدكتور أحمد أبو حاكمة لاستكمال كتابة التاريخ منفرداً، وطُبع بعنوان «تاريخ الكويت الجزء الأول – لجنة تاريخ الكويت 1967م» معبّراً عن نمط جديد في كتابة تاريخ الإمارة.", [
+    M("من الذي قررت اللجنة عام 1965م الاستعانة به لاستكمال كتابة التاريخ منفرداً؟", "الدكتور أحمد أبو حاكمة", ["حسين خزعل", "عبد العزيز الدوري", "صالح العلي"]),
+    M("متى قررت لجنة كتابة تاريخ الكويت الاستعانة بأبي حاكمة؟", "1965م", ["1959م", "1962م", "1967م"]),
+    M("بأي عنوان طُبع عمل أبي حاكمة عام 1967م؟", "«تاريخ الكويت الجزء الأول – لجنة تاريخ الكويت»", ["«تاريخ الكويت السياسي»", "«صفحات من تاريخ الكويت»", "«الكويت وجاراتها»"]),
+    M("ما الذي عبّر عنه عمل أبي حاكمة (الطبعة الرسمية)؟", "نمطاً جديداً في كتابة تاريخ الإمارة", ["العودة إلى الرواية الشفوية", "نقل الوثائق الغربية فقط", "الاختصار للمدارس"]),
+    M("أي ترتيب زمني صحيح؟", "تشكيل اللجنة (1959) ← قرار الاستعانة بأبي حاكمة (1965) ← الطبع (1967)", ["الطبع (1967) ← تشكيل اللجنة (1959) ← القرار (1965)", "القرار (1965) ← تشكيل اللجنة (1959) ← الطبع (1967)", "الطبع (1967) ← القرار (1965) ← تشكيل اللجنة (1959)"]),
+    T("طُبع «تاريخ الكويت – الجزء الأول» (لجنة تاريخ الكويت) عام 1967م.", true),
+    T("قررت اللجنة عام 1965م الاستعانة بأبي حاكمة لاستكمال كتابة التاريخ منفرداً.", true),
+    T("طبعت لجنة تاريخ الكويت «الجزء الأول» عام 1946م.", false),
+    M("أي الأشخاص التالية أسماؤهم من فلسطين؟", "أحمد مصطفى أبو حاكمة", ["عبد العزيز الدوري", "صالح العلي", "حسين خزعل"]),
+  ]);
+  I("committee-extra", 1, "شُكّلت لجنة كتابة تاريخ الكويت عام 1959م بعد مقترح من الشيخ صباح الأحمد الصباح رئيس دائرة المطبوعات والنشر آنذاك؛ وضمت الدوري وصالح العلي (عراقيان) وأبو حاكمة (فلسطين) وحسين خزعل.", [
+    M("أي عبارة صحيحة عن لجنة كتابة تاريخ الكويت؟", "شُكّلت عام 1959م بعد مقترح من الشيخ صباح الأحمد", ["شُكّلت عام 1926م بمقترح من الرشيد", "شُكّلت عام 1965م بمقترح من لوريمر", "شُكّلت عام 1946م بمقترح من القناعي"]),
+    M("كم عدد أعضاء لجنة كتابة تاريخ الكويت المذكورين في الدرس؟", "أربعة", ["ثلاثة", "خمسة", "ستة"]),
+    M("أي ثنائي من أعضاء اللجنة هما أكاديميان عراقيان؟", "عبد العزيز الدوري وصالح العلي", ["أبو حاكمة وخزعل", "الدوري وأبو حاكمة", "العلي وخزعل"]),
+    M("أي مما يلي ليس عضواً في لجنة كتابة تاريخ الكويت؟", "يوسف بن عيسى القناعي", ["حسين خزعل", "صالح العلي", "أحمد مصطفى أبو حاكمة"]),
+    M("ما سبب الحاجة إلى تشكيل اللجنة في نهاية الخمسينيات؟", "الحاجة إلى مؤلَّف تاريخي يبرز أهمية الكويت ودورها ويتصدى للتحديات والادعاءات", ["غياب أي كتاب عن الكويت", "طلب الدولة العثمانية", "انتهاء الرواية الشفوية"]),
+    T("اقترح تشكيل اللجنة الشيخ صباح الأحمد الصباح عندما كان رئيس دائرة المطبوعات والنشر.", true),
+    T("كان صالح العلي عضواً فلسطينياً في اللجنة.", false),
+    T("كان من أسباب تشكيل اللجنة التصدي للتحديات والادعاءات التي تواجه الكويت.", true),
+  ]);
+  I("niebuhr-full", 1, "الرحالة كارستن نيبور زار المنطقة عام 1761م لاستكشافها (وتظهر على خريطته تسمية «القرين»).", [
+    M("من الرحالة الذي زار المنطقة عام 1761م لاستكشافها؟", "كارستن نيبور", ["باكنجهام", "لوشر", "لويس بيلي"]),
+    M("لأي غرض زار نيبور المنطقة؟", "استكشافها", ["التجارة بالنفط", "القتال في موقعة ذات السلاسل", "التنقيب الأثري"]),
+    M("أكمل: زار كارستن نيبور المنطقة عام ........ م لاستكشافها.", "1761", ["1816", "1868", "1784"]),
+    M("أي رحالة غربي هو الأقدم زمناً بين التالية؟", "كارستن نيبور (1761م)", ["باكنجهام (1816م)", "لوشر (1868م)", "لويس بيلي (1863م)"]),
+    T("زار كارستن نيبور المنطقة عام 1761م لاستكشافها.", true),
+    T("نيبور هو الرحالة الأمريكي الذي قدّر سكان الكويت بين 15 و20 ألفاً.", false),
+  ]);
+  I("buckingham-full", 1, "الرحالة والصحفي الإنجليزي باكنجهام زار المنطقة عام 1816م وكتب: «الكويت مستقلة، والكويتيون أكثر أهل الخليج حباً للحرية والإقدام».", [
+    M("من كتب: «الكويت مستقلة، والكويتيون أكثر أهل الخليج حباً للحرية والإقدام»؟", "باكنجهام", ["لوشر", "نيبور", "لوريمر"]),
+    M("أكمل قول باكنجهام: «الكويت ........ والكويتيون أكثر أهل الخليج حباً للحرية والإقدام».", "مستقلة", ["متطورة", "ثرية", "عريقة"]),
+    M("أكمل قول باكنجهام: «الكويت مستقلة، والكويتيون أكثر أهل الخليج حباً ........».", "للحرية والإقدام", ["للتجارة والسفر", "للعلم والمعرفة", "للغوص واللؤلؤ"]),
+    M("باكنجهام كان:", "رحالة وصحفياً إنجليزياً", ["رحالة أمريكياً", "مقيماً سياسياً في بوشهر", "موظفاً في حكومة بومباي"]),
+    M("متى زار باكنجهام المنطقة؟", "1816م", ["1761م", "1868م", "1863م"]),
+    T("باكنجهام رحالة وصحفي إنجليزي زار المنطقة عام 1816م.", true),
+    T("وصف باكنجهام الكويت بأنها «متطورة ونظيفة عن غيرها من المدن».", false),
+  ]);
+  I("lusher-full", 1, "الرحالة الأمريكي لوشر (1868م) وصف الكويت بأنها «متطورة ونظيفة عن غيرها من المدن»، وقدّر سكانها بين 15 و20 ألف نسمة.", [
+    M("من وصف الكويت بأنها «متطورة ونظيفة عن غيرها من المدن»؟", "الرحالة الأمريكي لوشر", ["باكنجهام", "نيبور", "ديكسون"]),
+    M("أكمل: وصف لوشر الكويت بأنها «متطورة و........ عن غيرها من المدن».", "نظيفة", ["جميلة", "غنية", "آمنة"]),
+    M("ما جنسية الرحالة لوشر؟", "أمريكي", ["إنجليزي", "دنماركي", "ألماني"]),
+    M("أي عام ارتبط بزيارة لوشر؟", "1868م", ["1761م", "1816م", "1784م"]),
+    S("كم قدّر لوشر عدد سكان الكويت؟", "بين 15 و20 ألف نسمة", ["بين 5 و10 آلاف نسمة", "بين 30 و40 ألف نسمة", "نحو 100 ألف نسمة"], ["15-20 الف", "15 الى 20 الف"]),
+    T("قدّر لوشر سكان الكويت بما بين 15 و20 ألف نسمة.", true),
+    T("لوشر رحالة إنجليزي وصحفي.", false),
+  ]);
+  I("taylor-warden", 1, "روبرت تيلور (مساعد الوكيل السياسي في العراق) كتب تقريراً وثائقياً مؤرخاً 1818م عن العتوب؛ وفرانسيس واردن (موظف حكومة بومباي الإنجليزية) كتب مقالة عام 1819م عن العتوب وتأسيس السلطة.", [
+    M("من كتب تقريراً وثائقياً مؤرخاً في عام 1818م يتناول تاريخ العتوب؟", "روبرت تيلور", ["فرانسيس واردن", "لويس بيلي", "هارولد ديكسون"]),
+    M("من كتب مقالة عام 1819م عن العتوب وتأسيس السلطة؟", "فرانسيس واردن", ["روبرت تيلور", "باكنجهام", "لوريمر"]),
+    M("ما وظيفة روبرت تيلور؟", "مساعد الوكيل السياسي في العراق", ["موظف حكومة بومباي", "المقيم السياسي في بوشهر", "المعتمد السياسي في الكويت"]),
+    M("إلى أي جهة كان ينتمي فرانسيس واردن؟", "حكومة بومباي الإنجليزية", ["شركة الهند الشرقية في البصرة", "الإدارة البريطانية الهندية", "المقيمية البريطانية في بوشهر"]),
+    M("أي ثنائي صحيح؟", "تيلور ← تقرير وثائقي (1818م) • واردن ← مقالة (1819م)", ["تيلور ← مقالة (1819م) • واردن ← تقرير (1818م)", "تيلور ← كتاب (1926م) • واردن ← كتاب (1946م)", "تيلور ← خريطة (1761م) • واردن ← مقالة (1868م)"]),
+    M("موضوع تقرير تيلور ومقالة واردن هو:", "العتوب", ["الآثار الهلنستية", "قناة السويس", "النفط الكويتي"]),
+    T("كتب روبرت تيلور تقريراً وثائقياً عن العتوب مؤرخاً عام 1818م.", true),
+    T("كتب فرانسيس واردن مقالة عام 1818م.", false),
+  ]);
+  I("lorimer-full", 1, "ج. ج. لوريمر موظف الإدارة البريطانية الهندية، ألّف «سجل الأحداث في الخليج وعمان ووسط الجزيرة» (دليل الخليج): موسوعة تاريخية وجغرافية وإحصائية لتعريف المبعوثين الرسميين البريطانيين بأحوال الخليج وطبيعته.", [
+    M("أي مؤلَّف غربي هو أهم مؤلَّف غربي موسّع عن المنطقة؟", "«سجل الأحداث في الخليج وعمان ووسط الجزيرة» للوريمر", ["«الكويت وجاراتها» لديكسون", "«عرب الصحراء» لديكسون", "«تاريخ الكويت» للرشيد"]),
+    M("أكمل: كتاب لوريمر المعروف لاحقاً بـ«........».", "دليل الخليج", ["الكويت وجاراتها", "عرب الصحراء", "صفحات من التاريخ"]),
+    M("وظيفة لوريمر:", "موظف الإدارة البريطانية الهندية", ["رحالة أمريكي", "مقيم سياسي في بوشهر", "معتمد سياسي في البصرة"]),
+    M("لمن كُتب «دليل الخليج» في الأصل؟", "للمبعوثين الرسميين البريطانيين", ["لطلبة المدارس الكويتية", "للأكاديميين العراقيين", "للرحالة الأمريكيين"]),
+    M("لماذا كتب لوريمر «دليل الخليج»؟", "ليتعرف المبعوثون البريطانيون على أحوال الخليج العربي وطبيعته", ["لتوثيق تاريخ الكويت الاقتصادي فقط", "للدعاية السياحية", "لتأريخ الفتح الإسلامي"]),
+    M("«دليل الخليج» يُعتبر:", "موسوعة تاريخية وجغرافية وإحصائية", ["مجموعة قصائد", "تقريراً من صفحتين", "كتاباً مدرسياً مبسطاً"]),
+    T("«دليل الخليج» للوريمر موسوعة تاريخية وجغرافية وإحصائية.", true),
+    T("كتب لوريمر «دليل الخليج» ليدرسه طلبة المدارس في الكويت.", false),
+  ]);
+  I("bridges-pelly-dickson", 1, "هارفرد جونز بريدجز: المعتمد السياسي لشركة الهند الشرقية في البصرة (من 1784م). لويس بيلي: المقيم السياسي البريطاني في بوشهر زار الكويت 1863 و1865م. هارولد ديكسون: المعتمد السياسي البريطاني في الكويت، ألّف «الكويت وجاراتها» و«عرب الصحراء»، وعاش في الكويت 1929–1959م.", [
+    M("أين كان مقر هارفرد جونز بريدجز المعتمد السياسي لشركة الهند الشرقية؟", "البصرة", ["بوشهر", "الكويت", "بومباي"]),
+    M("لأي جهة كان يعمل هارفرد جونز بريدجز؟", "شركة الهند الشرقية", ["حكومة بومباي", "الدولة العثمانية", "الإدارة البريطانية الهندية"]),
+    M("متى بدأ عمل بريدجز معتمداً سياسياً؟", "اعتباراً من عام 1784م", ["1761م", "1816م", "1863م"]),
+    M("أين كان مقر لويس بيلي؟", "بوشهر", ["البصرة", "الكويت", "بومباي"]),
+    M("كم مرة زار لويس بيلي الكويت وفي أي عامين؟", "مرتين: 1863م و1865م", ["مرة واحدة: 1868م", "مرتين: 1816م و1819م", "ثلاث مرات: 1929م و1946م و1959م"]),
+    M("من المعتمد السياسي البريطاني في الكويت الذي ألّف «الكويت وجاراتها»؟", "هارولد ديكسون", ["لويس بيلي", "لوريمر", "بريدجز"]),
+    M("ما الكتاب الآخر الذي ألّفه هارولد ديكسون إضافة إلى «الكويت وجاراتها»؟", "«عرب الصحراء»", ["«دليل الخليج»", "«صفحات من تاريخ الكويت»", "«تاريخ الكويت السياسي»"]),
+    M("ما الفترة التي عاش فيها ديكسون بالكويت؟", "من 1929 إلى 1959م", ["من 1761 إلى 1816م", "من 1863 إلى 1865م", "من 1959 إلى 1967م"]),
+    S("ما وظيفة هارولد ديكسون؟", "المعتمد السياسي البريطاني في الكويت", ["المقيم السياسي في بوشهر", "المعتمد السياسي في البصرة", "موظف حكومة بومباي"], ["معتمد سياسي"]),
+    T("زار لويس بيلي الكويت في عامي 1863م و1865م.", true),
+    T("هارفرد جونز بريدجز كان المعتمد السياسي البريطاني في الكويت.", false),
+    T("كان هارولد ديكسون يعيش في الكويت فترات امتدت من 1929 إلى 1959م.", true),
+    T("كان لويس بيلي المقيم السياسي البريطاني في البصرة.", false),
+  ]);
+  I("western-general", 1, "تناول الرحالة الغربيون الذين زاروا شبه الجزيرة العربية في كتاباتهم معلومات مهمة عن الكويت، وكتب مسؤولون غربيون تقارير عنها.", [
+    M("إضافة إلى المؤلفات المحلية، من الذين تناولوا معلومات مهمة عن الكويت في كتاباتهم؟", "الرحالة الغربيون الذين زاروا شبه الجزيرة العربية", ["الأئمة والفقهاء فقط", "الصحف الكويتية في الثلاثينيات", "علماء الآثار الدنماركيون فقط"]),
+    M("أي مما يلي من مصادر المعلومات عن الكويت حسب الدرس الأول؟", "تقارير المسؤولين الغربيين", ["الرواية الشفوية فقط", "الأفلام الوثائقية", "الصور الجوية"]),
+    M("أي مما يلي يمثل تقريراً/مقالة كتبها مسؤولون غربيون عن العتوب؟", "تقرير تيلور ومقالة واردن", ["كتاب الرشيد وكتاب القناعي", "خريطة نيبور ومقال الكرملي", "كتاب خزعل وكتاب الشملان"]),
+    T("كتب رحالة غربيون زاروا شبه الجزيرة العربية معلومات مهمة عن الكويت.", true),
+    T("لم يكتب أي مسؤول غربي عن الكويت في تقارير رسمية.", false),
+  ]);
+
+  // ---------- LESSON 2 ITEMS ----------
+  I("geo-intro", 2, "ليس من السهل فهم تاريخ أية منطقة دون دراسة موقعها الجغرافي وبيئتها الطبيعية، لما لهما من تأثير مباشر على سير الأحداث التاريخية.", [
+    M("لماذا لا يسهل فهم تاريخ أية منطقة دون دراسة موقعها الجغرافي وبيئتها الطبيعية؟", "لتأثيرهما المباشر على سير الأحداث التاريخية", ["لأنهما يغيّران لغة السكان فقط", "لأنهما يحددان عدد المؤلفات", "لأنهما لا علاقة لهما بالتاريخ"]),
+    M("أكمل: ليس من السهل فهم تاريخ أية منطقة دون دراسة ........ والبيئة الطبيعية.", "الموقع الجغرافي", ["الحكام فقط", "الأنساب", "التقويم الهجري"]),
+    M("أي العوامل التالية لها تأثير مباشر على سير الأحداث التاريخية لمنطقة ما حسب الدرس؟", "الموقع الجغرافي والبيئة الطبيعية", ["اللون الرسمي للعلم", "عدد المدارس", "أسماء الشوارع"]),
+    T("للموقع الجغرافي والبيئة الطبيعية تأثير مباشر على سير الأحداث التاريخية لأية منطقة.", true),
+    T("يمكن فهم تاريخ أية منطقة بسهولة دون دراسة موقعها وبيئتها.", false),
+  ]);
+  I("gulf-strategic", 2, "الخليج العربي له أهمية كبرى لموقعه الاستراتيجي المتميز الذي يتوسط قارات العالم القديم (آسيا وأفريقيا وأوروبا) ولقربه من أقدم الحضارات الإنسانية المعروفة.", [
+    M("أي قارات العالم القديم يتوسطها الخليج العربي؟", "آسيا وأفريقيا وأوروبا", ["آسيا وأوروبا وأمريكا", "أفريقيا وأستراليا وأوروبا", "آسيا وأمريكا الجنوبية وأفريقيا"]),
+    M("ما سبب الأهمية الكبرى للخليج العربي؟", "موقعه الاستراتيجي المتميز وقربه من أقدم الحضارات", ["كونه أكبر خليج في العالم", "خلوه من الموانئ", "بعده عن الحضارات القديمة"]),
+    M("أكمل: يتوسط الخليج العربي قارات العالم ........ (آسيا وأفريقيا وأوروبا).", "القديم", ["الجديد", "الحديث", "الجنوبي"]),
+    M("أي عبارة عن الخليج العربي غير صحيحة؟", "بعيد عن أقدم الحضارات الإنسانية", ["موقعه استراتيجي متميز", "يتوسط قارات العالم القديم", "قريب من أقدم الحضارات المعروفة"]),
+    T("يتوسط الخليج العربي قارات العالم القديم: آسيا وأفريقيا وأوروبا.", true),
+    T("يتوسط الخليج العربي قارتي أمريكا وأستراليا.", false),
+  ]);
+  I("gulf-naming", 2, "عبر التاريخ سُمّي الخليج العربي: البحر الأدنى، وبحر الشروق الكبير؛ والإغريق أول من أطلق «الخليج الفارسي»؛ والرومان في القرن الأول الميلادي «الخليج العربي»؛ وفي العهد الإسلامي «بحر العرب» وغيره.", [
+    M("أي اسم أطلقه الإغريق على الخليج العربي؟", "الخليج الفارسي", ["الخليج العربي", "بحر العرب", "البحر الأدنى"]),
+    M("أي اسم أطلقه الرومان على الخليج في القرن الأول الميلادي؟", "الخليج العربي", ["الخليج الفارسي", "بحر الشروق الكبير", "البحر الأدنى"]),
+    M("أي اسم من أسماء الخليج ظهر في العهد الإسلامي؟", "بحر العرب", ["الخليج الفارسي", "بحر الشروق الكبير", "البحر الأدنى"]),
+    M("أي من التالية من أسماء الخليج العربي في المصادر التاريخية؟", "البحر الأدنى", ["بحر الظلمات", "بحر الروم", "بحر القلزم"]),
+    M("أي من التالية من أسماء الخليج العربي في المصادر التاريخية؟", "بحر الشروق الكبير", ["بحر الظلمات", "بحر الروم", "بحر القلزم"]),
+    M("من أول من أطلق اسم «الخليج الفارسي»؟", "الإغريق", ["الرومان", "العرب المسلمون", "البريطانيون"]),
+    M("أي عبارة عن تسميات الخليج غير صحيحة؟", "الرومان هم أول من أطلق اسم الخليج الفارسي", ["الإغريق أول من أطلق الخليج الفارسي", "الرومان أطلقوا الخليج العربي في القرن الأول الميلادي", "سُمّي في العهد الإسلامي بحر العرب"]),
+    M("أكمل: أطلق ........ على الخليج اسم «الخليج العربي» في القرن الأول الميلادي.", "الرومان", ["الإغريق", "الفرس", "البرتغاليون"]),
+    M("أكمل: في العهد ........ سُمّي الخليج بعدة تسميات منها «بحر العرب».", "الإسلامي", ["الهلنستي", "العثماني", "الروماني"]),
+    T("أطلق الإغريق على الخليج اسم «الخليج الفارسي».", true),
+    T("سُمّي الخليج «بحر العرب» في العهد الإسلامي.", true),
+    T("سُمّي الخليج «الخليج العربي» من قبل الإغريق في القرن الأول الميلادي.", false),
+  ]);
+  I("gulf-arab", 2, "تسمية بحر الخليج كانت ولا تزال محل جدل (عربياً أم فارسياً)، ولكن الواقع الجغرافي والتاريخي وطبيعة السكان العرب على شواطئه الشمالية والشرقية والغربية منذ القدم يؤكد أنه عربي الأصل والنشأة.", [
+    M("ما محل الجدل في تسمية بحر الخليج؟", "أن يكون الخليج عربياً أم فارسياً", ["أن يكون بحراً أم محيطاً", "أن يكون مالحاً أم عذباً", "أن يكون شمالياً أم جنوبياً"]),
+    M("أي مما يلي من الأدلة على عروبة الخليج؟", "الواقع الجغرافي والتاريخي وطبيعة السكان العرب على شواطئه", ["تسمية الإغريق له", "وجود جزر فيه", "قربه من الهند"]),
+    M("على أي شواطئ الخليج عاش العرب منذ القدم؟", "الشمالية والشرقية والغربية", ["الغربية فقط", "الجنوبية فقط", "الشمالية فقط"]),
+    M("يؤكد الدرس أن الخليج:", "عربي الأصل والنشأة", ["فارسي الأصل والنشأة", "يوناني النشأة", "لا أصل له"]),
+    T("تسمية بحر الخليج كانت ولا تزال محل جدل.", true),
+    T("يؤكد الواقع الجغرافي والتاريخي وطبيعة السكان أن الخليج فارسي الأصل.", false),
+  ]);
+  I("gulf-civ", 2, "شكّل الخليج العربي رافداً حضارياً مهماً ساهم في التبادلات الثقافية والتجارية بين الحضارات الكبرى؛ إلى الشمال حضارة بلاد النهرين، وإلى الشرق ثلاث حضارات: العيلامية والميدية وفارس.", [
+    M("أي حضارة قامت إلى شمال الخليج العربي؟", "حضارة بلاد النهرين", ["العيلامية", "الميدية", "فارس"]),
+    M("أي الحضارات التالية ليست من الحضارات الثلاث شرق الخليج؟", "حضارة بلاد النهرين", ["العيلامية", "الميدية", "فارس"]),
+    M("أي مجموعة تمثل الحضارات الثلاث الأساسية إلى شرق الخليج العربي؟", "العيلامية والميدية وفارس", ["السومرية والفرعونية والرومانية", "العيلامية والفينيقية والإغريقية", "الميدية والبابلية والآشورية"]),
+    M("ماذا شكّل الخليج العربي للحضارات المجاورة؟", "رافداً حضارياً مهماً للتبادلات الثقافية والتجارية", ["حاجزاً طبيعياً بينها", "حدوداً سياسية فقط", "طريقاً بريّاً"]),
+    M("أكمل: إلى الشمال من الخليج حضارة ........", "بلاد النهرين", ["فارس", "الميدية", "العيلامية"]),
+    M("أكمل: ومن ناحية الشرق احتوى الخليج على ........ حضارات أساسية.", "ثلاث", ["اثنتين", "أربع", "خمس"]),
+    T("إلى الشمال من الخليج تقع حضارة بلاد النهرين.", true),
+    T("الحضارة الميدية تقع إلى شمال الخليج العربي.", false),
+  ]);
+  I("gulf-link", 2, "ساهم الخليج في اتصال الحضارات القديمة بعضها ببعض؛ فحضارات الهند والسند والصين القديمة كان الخليج وسيلة الاتصال الأهم بينها وبين حضارات البحر المتوسط وأوروبا، مباشرة عبر مياهه أو غير مباشرة عبر سكان سواحله.", [
+    M("أي الحضارات اتصلت بحضارات المتوسط وأوروبا عبر الخليج العربي؟", "الهند والسند والصين القديمة", ["مصر الفرعونية والحبشة", "روما وقرطاج", "المايا والإنكا"]),
+    M("كيف تم الاتصال بين حضارات الهند والصين وحضارات المتوسط عبر الخليج؟", "مباشرة عبر مياهه أو غير مباشرة عبر سكان سواحله", ["عبر قناة السويس فقط", "عبر الطائرات", "عبر الطرق البرية الجبلية فقط"]),
+    M("كان الخليج العربي هو ........ بين حضارات الهند والسند والصين وحضارات البحر المتوسط وأوروبا.", "وسيلة الاتصال الأهم", ["العائق الوحيد", "الحد الفاصل", "الطريق البري"]),
+    T("كان الخليج وسيلة الاتصال الأهم بين حضارات الهند والسند والصين القديمة وحضارات المتوسط وأوروبا.", true),
+    T("لم يكن للخليج دور في اتصال حضارات الهند والسند بالحضارات الغربية.", false),
+  ]);
+  I("suez-oil-full", 2, "بعد افتتاح قناة السويس عام 1869م تراجع الازدهار والنشاط البحري في الخليج، ثم بعد اكتشاف النفط عاد النشاط البحري معتمداً بشكل رئيسي على نقل النفط؛ وشهدت الكويت 1946م الاحتفال بتصدير أول شحنة نفط بحضور الشيخ أحمد الجابر الصباح.", [
+    M("أي حدث أدى إلى تراجع الازدهار والنشاط البحري في الخليج؟", "افتتاح قناة السويس عام 1869م", ["اكتشاف النفط", "موقعة ذات السلاسل", "تشكيل لجنة كتابة التاريخ"]),
+    M("أي حدث أعاد النشاط البحري إلى الخليج؟", "اكتشاف النفط", ["افتتاح قناة السويس", "بعثة أرهوس", "إطلاق اسم الخليج العربي"]),
+    M("على أي شيء اعتمد النشاط البحري في الخليج بعد اكتشاف النفط؟", "نقل النفط", ["الغوص على اللؤلؤ", "التجارة مع الصين القديمة", "صيد السمك"]),
+    M("متى افتُتحت قناة السويس؟", "1869م", ["1946م", "1816م", "1926م"]),
+    M("ماذا شهدت الكويت عام 1946م؟", "الاحتفال بتصدير أول شحنة من النفط الكويتي", ["افتتاح قناة السويس", "بدء بعثة أرهوس", "طباعة كتاب الرشيد"]),
+    M("من كان حاكم الكويت حين صُدّرت أول شحنة نفط؟", "الشيخ أحمد الجابر الصباح", ["الشيخ صباح الأحمد الصباح", "الشيخ عبد الله السالم الصباح", "الشيخ مبارك الصباح"]),
+    M("أي ترتيب زمني صحيح؟", "افتتاح قناة السويس (1869) ثم تصدير أول شحنة نفط كويتي (1946)", ["تصدير النفط (1946) ثم افتتاح القناة (1869)", "بعثة أرهوس (1958) ثم قناة السويس (1869) ثم النفط (1946)", "افتتاح القناة (1869) ثم بدء مسح الصبية (1998) ثم النفط (1946)"]),
+    T("تراجع النشاط البحري في الخليج بعد افتتاح قناة السويس.", true),
+    T("عاد النشاط البحري إلى الخليج بعد اكتشاف النفط معتمداً على نقل النفط.", true),
+    T("احتُفل بتصدير أول شحنة من النفط الكويتي عام 1869م.", false),
+    T("حضر الشيخ أحمد الجابر الصباح احتفال تصدير أول شحنة نفط كويتي.", true),
+  ]);
+  I("kuwait-loc-full", 2, "تقع الكويت على جون في الركن الشمالي الغربي (من الخليج)، بين خطي طول 46–49 شرقاً ودائرتي عرض 28–30 شمالاً، يحدها شمالاً العراق ومن الجنوب والغرب السعودية ومن الشرق الخليج العربي.", [
+    M("أي العبارات التالية عن موقع الكويت صحيحة؟", "تقع بين خطي طول 46–49 شرقاً ودائرتي عرض 28–30 شمالاً", ["تقع بين خطي طول 28–30 شرقاً", "تقع في الركن الجنوبي الشرقي من الخليج", "يحدها شرقاً العراق"]),
+    M("أي عبارة عن حدود الكويت غير صحيحة؟", "يحدها من الشرق المملكة العربية السعودية", ["يحدها شمالاً العراق", "يحدها من الجنوب والغرب السعودية", "يحدها من الشرق الخليج العربي"]),
+    M("أي حد جغرافي يوصف به الجنوب والغرب من الكويت؟", "المملكة العربية السعودية", ["العراق", "الخليج العربي", "إيران"]),
+    M("أكمل: تقع الكويت على ........ في الركن الشمالي الغربي من الخليج.", "جون", ["جزيرة", "جبل", "واحة"]),
+    M("أكمل: تقع الكويت بين خطي طول ........ شرقاً.", "46 – 49", ["28 – 30", "50 – 54", "35 – 40"]),
+    M("أكمل: تقع الكويت بين دائرتي عرض ........ شمالاً.", "28 – 30", ["46 – 49", "20 – 24", "32 – 35"]),
+    T("يحد الكويت من الشرق الخليج العربي.", true),
+    T("يحد الكويت شمالاً المملكة العربية السعودية.", false),
+    T("تقع الكويت بين دائرتي عرض 28 و30 شمالاً.", true),
+  ]);
+  I("kuwait-trade-reasons", 2, "تميّز موقع الكويت: نهاية الطريق الملاحي والتجاري على طريق الهند والشرق الأقصى؛ مركز تجاري للوافدين من نجد والإحساء وبادية الشام؛ منطقة تجارة عبور (ترانزيت) قليلة الضرائب؛ فيها أحد أهم الموانئ؛ وتميّز الكويتيين في نقل التجارة بين موانئ الخليج وسواحل الهند والشرق الأفريقي.", [
+    M("موقع الكويت يمثّل النهاية الطبيعية للطريق الملاحي والتجاري الواقع على طريق:", "الهند ومنطقة الشرق الأقصى", ["مصر وقناة السويس", "أمريكا الشمالية", "أوروبا الغربية"]),
+    M("لأي منطقة يمثل موقع الكويت مركزاً تجارياً للوافدين عليها؟", "نجد والإحساء وبادية الشام", ["مصر والسودان", "الهند والصين", "الأناضول وأوروبا"]),
+    M("لماذا كانت الكويت مناسبة لتجارة العبور (الترانزيت)؟", "لأنها منطقة قليلة الضرائب", ["لأن الضرائب فيها مرتفعة جداً", "لأنها بلا ميناء", "لأنها تقع داخل نجد"]),
+    M("أكمل: الكويت منطقة لتجارة ........ (ترانزيت) قليلة الضرائب.", "العبور", ["التصدير فقط", "الاستيراد فقط", "الزراعة"]),
+    M("ما الذي تميّز به الكويتيون في نقل التجارة؟", "النقل بين موانئ الخليج وسواحل الهند والشرق الأفريقي", ["النقل بين الصين وأمريكا", "النقل عبر الصحراء إلى بغداد فقط", "النقل بين مصر وأوروبا"]),
+    M("أي مما يلي لا يُعد من أسباب تميّز الموقع الجغرافي للكويت؟", "وفرة الأنهار الدائمة", ["وجود أحد أهم موانئ المنطقة", "تجارة عبور قليلة الضرائب", "مركز تجاري للوافدين من نجد والإحساء"]),
+    M("أي عبارة تمثل سبباً صحيحاً لتميّز موقع الكويت؟", "فيها أحد أهم الموانئ في المنطقة، وبها نشاط بحري وتجاري كبير", ["بعدها عن الخليج العربي", "عزلتها عن التجارة", "قربها من قناة السويس"]),
+    T("يمثل موقع الكويت النهاية الطبيعية للطريق الملاحي والتجاري على طريق الهند والشرق الأقصى.", true),
+    T("الكويت مركز تجاري للوافدين من نجد والإحساء وبادية الشام.", true),
+    T("الكويت منطقة تجارة عبور مرتفعة الضرائب.", false),
+    T("تميّز الكويتيون في نقل التجارة بين موانئ الخليج وسواحل الهند والشرق الأفريقي.", true),
+    M("تُمثّل الكويت بوابة طبيعية لـ:", "شمال شرق الجزيرة العربية", ["جنوب غرب الجزيرة العربية", "بلاد الشام", "شمال أفريقيا"]),
+  ]);
+  I("aarhus-full", 2, "دلّت اكتشافات بعثة متحف أرهوس الدنماركي (بدأت أعمالها عام 1958م) على وجود آثار تعود لفترات أقدم من العصر الهلنستي؛ وتُعتبر جزيرة فيلكا درة المواقع الأثرية.", [
+    M("أي بعثة بدأت أعمالها في الكويت عام 1958م؟", "بعثة متحف أرهوس الدنماركي", ["البعثة الكويتية–البريطانية", "البعثة الكويتية–البولندية", "البعثة الفرنسية"]),
+    M("من أي دولة بعثة متحف أرهوس؟", "الدنمارك", ["فرنسا", "بريطانيا", "بولندا"]),
+    M("إلى ماذا دلّت اكتشافات بعثة أرهوس؟", "وجود آثار تعود لفترات أقدم من العصر الهلنستي", ["وجود آثار تعود للقرن العشرين فقط", "وجود آثار إسلامية فقط", "عدم وجود آثار"]),
+    M("أي موقع يُعتبر درة المواقع الأثرية في الكويت؟", "جزيرة فيلكا", ["الصبية", "عكاز", "كاظمة"]),
+    M("لماذا تُعتبر جزيرة فيلكا درة المواقع الأثرية؟", "لما تضمه من تلال أثرية", ["لأنها أكبر مدن الكويت", "لأنها أقدم ميناء نفطي", "لأنها موقع موقعة ذات السلاسل"]),
+    M("أكمل: بدأت بعثة متحف أرهوس أعمالها عام ........ م.", "1958", ["1869", "1946", "1998"]),
+    T("بدأت بعثة متحف أرهوس الدنماركي أعمالها عام 1958م.", true),
+    T("جزيرة فيلكا هي درة المواقع الأثرية في الكويت.", true),
+    T("بدأت بعثة متحف أرهوس أعمالها عام 1998م.", false),
+  ]);
+  I("failaka-tells", 2, "تضم فيلكا التلال: تل سعد (ف 3)، دار الضيافة (ف 4)، تل سعيد (ف 5)، قصر الحاكم (ف 5)، إضافة إلى القلعة الهلنستية.", [
+    M("أي موقع في فيلكا رمزه (ف 3)؟", "تل سعد", ["دار الضيافة", "تل سعيد", "قصر الحاكم"]),
+    M("أي موقع في فيلكا رمزه (ف 4)؟", "دار الضيافة", ["تل سعد", "تل سعيد", "الصبية"]),
+    M("أي موقع في فيلكا رمزه (ف 5)؟", "تل سعيد", ["تل سعد", "دار الضيافة", "عكاز"]),
+    M("أي من التالية ليست من تلال/مواقع جزيرة فيلكا؟", "تل عكاز", ["تل سعد", "دار الضيافة", "قصر الحاكم"]),
+    M("أي من التالية من مواقع جزيرة فيلكا الأثرية؟", "القلعة الهلنستية", ["الصبية", "كاظمة", "عكاز"]),
+    M("أي ترتيب لرموز التلال صحيح (تل سعد، دار الضيافة، تل سعيد)؟", "ف 3 ← ف 4 ← ف 5", ["ف 5 ← ف 4 ← ف 3", "ف 1 ← ف 2 ← ف 3", "ف 4 ← ف 3 ← ف 5"]),
+    T("تل سعد رمزه (ف 3).", true),
+    T("دار الضيافة رمزها (ف 5).", false),
+  ]);
+  I("ikaros-hellenistic", 2, "وردت تسمية جزيرة فيلكا باسم «إيكاروس» في النصوص اليونانية وفي كتابات الرحالة والمؤرخين الإغريق والرومان؛ وأكّد ذلك اكتشاف البعثة الدنماركية لحجر في القلعة الهلنستية (تل سعيد ف5) منقوش بالكتابة اليونانية فيه إشارة لاسم «إيكاروس»؛ واكتشفت البعثتان الدنماركية والفرنسية بقايا قلعة هلنستية تعود للقرن الثالث ق.م.", [
+    M("بأي اسم وردت فيلكا في النصوص اليونانية وكتابات الإغريق والرومان؟", "إيكاروس", ["دلمون", "القرين", "كاظمة"]),
+    M("ما الذي أكّد تسمية «إيكاروس»؟", "حجر منقوش بالكتابة اليونانية في القلعة الهلنستية", ["خريطة نيبور", "تقرير تيلور", "كتاب الرشيد"]),
+    M("أين وُجد الحجر المنقوش باسم «إيكاروس»؟", "في القلعة الهلنستية (تل سعيد ف5)", ["في موقع الصبية", "في تل عكاز", "في كاظمة"]),
+    M("بأي كتابة نُقش الحجر المكتشف؟", "الكتابة اليونانية", ["الكتابة الهيروغليفية", "الكتابة العربية", "الكتابة المسمارية"]),
+    M("أي بعثتين اكتشفتا بقايا القلعة الهلنستية في تل سعيد؟", "الدنماركية والفرنسية", ["الكويتية–البريطانية والبولندية", "الدنماركية والبريطانية", "الفرنسية والبولندية"]),
+    M("إلى أي قرن تعود القلعة الهلنستية في تل سعيد؟", "القرن الثالث قبل الميلاد", ["القرن السادس الميلادي", "القرن السابع الميلادي", "القرن الأول الميلادي"]),
+    M("أي موقع يُعتبر من أهم مواقع جزيرة فيلكا الأثرية حيث وُجدت القلعة الهلنستية؟", "تل سعيد (ف 5)", ["تل سعد (ف 3)", "دار الضيافة (ف 4)", "عكاز"]),
+    M("أكمل: ........ هو اسم جزيرة فيلكا في النصوص اليونانية.", "إيكاروس", ["تايلوس", "أرهوس", "كاظمة"]),
+    T("وردت تسمية فيلكا باسم «إيكاروس» في النصوص اليونانية.", true),
+    T("اكتُشفت القلعة الهلنستية في الصبية.", false),
+    T("اكتشفت البعثتان الدنماركية والفرنسية بقايا قلعة هلنستية في تل سعيد تعود للقرن الثالث قبل الميلاد.", true),
+  ]);
+  I("subiya-full", 2, "أسفرت أعمال التنقيب في الصبية (مسح البعثة الكويتية–البريطانية 1998م، واستكمال البعثة الكويتية–البولندية 2007م) عن الكشف عن واحد من أهم مواقع الاستيطان في الشرق الأدنى في فجر تاريخه، ويرتبط بحضارة العبيد (5500–3500 ق.م).", [
+    M("أي بعثة بدأت المسح الأثري في الصبية عام 1998م؟", "البعثة الكويتية–البريطانية", ["البعثة الكويتية–البولندية", "البعثة الدنماركية", "البعثة الفرنسية"]),
+    M("أي بعثة استكملت أعمال الصبية عام 2007م؟", "البعثة الكويتية–البولندية", ["البعثة الكويتية–البريطانية", "البعثة الدنماركية", "البعثة الفرنسية"]),
+    M("أي موقع أثري ارتبط بحضارة العبيد؟", "الصبية", ["فيلكا", "كاظمة", "عكاز"]),
+    M("ما الفترة الزمنية لحضارة العبيد المرتبطة بالصبية؟", "من 5500 إلى 3500 ق.م", ["من 3500 إلى 1500 ق.م", "من القرن الثالث ق.م", "من 633م"]),
+    M("لماذا تُعد الصبية مهمة؟", "الكشف عن واحد من أهم مواقع الاستيطان في الشرق الأدنى في فجر تاريخه", ["لأنها موقع موقعة ذات السلاسل", "لأنها أول حقل نفط", "لأنها مقر لجنة كتابة التاريخ"]),
+    M("أكمل: بدأ المسح الأثري في الصبية عام ........ م.", "1998", ["1958", "2007", "1946"]),
+    M("أكمل: استكملت البعثة الكويتية–البولندية أعمالها في الصبية عام ........ م.", "2007", ["1998", "1958", "1869"]),
+    M("أي ترتيب زمني للبعثات صحيح؟", "أرهوس (1958) ← الكويتية–البريطانية (1998) ← الكويتية–البولندية (2007)", ["الكويتية–البولندية (2007) ← أرهوس (1958) ← الكويتية–البريطانية (1998)", "الكويتية–البريطانية (1998) ← أرهوس (1958) ← البولندية (2007)", "أرهوس (1958) ← البولندية (2007) ← البريطانية (1998)"]),
+    T("ارتبط موقع الصبية بسمات حضارة العبيد.", true),
+    T("بدأت البعثة الكويتية–البولندية المسح الأثري في الصبية عام 1998م.", false),
+    T("استكملت البعثة الكويتية–البولندية أعمال الصبية عام 2007م.", true),
+    T("تؤرَّخ حضارة العبيد بالفترة من 5500 إلى 3500 قبل الميلاد.", true),
+    M("ما الذي أظهرته كل أعمال الحفائر الأثرية النشيطة في الكويت؟", "وجود آثار لاستقرار بشري في مواقع عديدة في أرض الكويت", ["عدم وجود استيطان بشري", "وجود آثار في فيلكا فقط", "وجود آثار إسلامية فقط"]),
+  ]);
+  I("akkaz-full", 2, "يعتبر التل الأثري في (عكاز) الواقع شمال غرب ميناء الشويخ من المواقع الأثرية الهامة.", [
+    M("أين يقع التل الأثري في عكاز؟", "شمال غرب ميناء الشويخ", ["جنوب شرق ميناء الشويخ", "في جزيرة فيلكا", "شمال خور الصبية"]),
+    M("أي ميناء يقع التل الأثري في عكاز إلى شمال غربه؟", "ميناء الشويخ", ["ميناء الأحمدي", "ميناء الشعيبة", "ميناء بوبيان"]),
+    M("أي التلال الأثرية التالية يقع شمال غرب ميناء الشويخ؟", "عكاز", ["كاظمة", "تل سعيد", "الصبية"]),
+    T("يقع تل عكاز الأثري شمال غرب ميناء الشويخ.", true),
+    T("يقع تل عكاز في جزيرة فيلكا.", false),
+  ]);
+  I("kazima-full", 2, "موقع كاظمة من أهم مواقع الآثار في الكويت: تشير المكتشفات (آثار منشآت معمارية أو شقاف فخارية أو زجاجية) إلى ازدهار الميناء من منتصف القرن السادس حتى نهاية القرن السابع الميلاديين؛ وهي محطة مهمة على طريق التجارة والحج.", [
+    M("أي موقع أثري كان محطة مهمة على طريق التجارة والحج؟", "كاظمة", ["عكاز", "الصبية", "تل سعيد"]),
+    M("متى ازدهر ميناء كاظمة؟", "من منتصف القرن السادس حتى نهاية القرن السابع الميلاديين", ["من القرن الثالث ق.م حتى القرن الأول الميلادي", "من 5500 إلى 3500 ق.م", "من القرن الثامن حتى العاشر الميلادي"]),
+    M("بماذا تشير مكتشفات كاظمة إلى ازدهار الميناء؟", "آثار منشآت معمارية وشقاف فخارية وزجاجية", ["حجر منقوش باليونانية", "هياكل من العصر الحجري", "قلعة هلنستية"]),
+    M("أي مما يلي لم يُذكر ضمن مكتشفات كاظمة؟", "قلعة هلنستية", ["آثار منشآت معمارية", "شقاف فخارية", "شقاف زجاجية"]),
+    M("أكمل: تُعتبر كاظمة محطة مهمة على طريق التجارة و........", "الحج", ["النفط", "الغوص", "الصيد"]),
+    M("أي موقع يرتبط بالعصر الإسلامي المبكر (ازدهار من القرن 6 إلى 7 م)؟", "كاظمة", ["الصبية", "تل سعيد", "عكاز"]),
+    T("تُعتبر كاظمة محطة مهمة على طريق التجارة والحج.", true),
+    T("ازدهر ميناء كاظمة في القرن الثالث قبل الميلاد.", false),
+    T("تُعد كاظمة من أهم مواقع الآثار في الكويت.", true),
+  ]);
+  I("salasil-full", 2, "جرت على أرض الكويت في العام 12هـ / 633م موقعة ذات السلاسل بين العرب المسلمين بقيادة خالد بن الوليد والفرس، وانتهت بانتصار المسلمين، وعُرفت باسم آخر هو «كاظمة».", [
+    M("أي موقعة جرت على أرض الكويت في العام 12هـ / 633م؟", "ذات السلاسل", ["القادسية", "اليرموك", "نهاوند"]),
+    M("من قائد المسلمين في ذات السلاسل؟", "خالد بن الوليد", ["سعد بن أبي وقاص", "عمرو بن العاص", "أبو عبيدة بن الجراح"]),
+    M("من خصوم المسلمين في ذات السلاسل؟", "الفرس", ["الروم", "العتوب", "بنو خالد"]),
+    M("بماذا انتهت موقعة ذات السلاسل؟", "بانتصار المسلمين", ["بانتصار الفرس", "بتعادل الطرفين", "بانسحاب الطرفين"]),
+    M("ما الاسم الآخر لموقعة ذات السلاسل؟", "كاظمة", ["فيلكا", "الصبية", "رأس تنورة"]),
+    M("أي عام هجري جرت فيه ذات السلاسل؟", "12هـ", ["8هـ", "15هـ", "21هـ"]),
+    M("أي عام ميلادي جرت فيه ذات السلاسل؟", "633م", ["636م", "629م", "642م"]),
+    M("كم يقابل 12هـ بالميلادي حسب الدرس؟", "633م", ["1761م", "1869م", "1946م"]),
+    T("جرت موقعة ذات السلاسل على أرض الكويت عام 12هـ / 633م.", true),
+    T("انتصر الفرس على المسلمين في موقعة ذات السلاسل.", false),
+    T("عُرفت موقعة ذات السلاسل باسم آخر هو «كاظمة».", true),
+    T("قاد خالد بن الوليد المسلمين في موقعة ذات السلاسل.", true),
+  ]);
+  I("conclusion-full", 2, "كل هذه الدلائل والآثار لا تدع مجالاً للشك بأن الكويت ومنذ القدم سكنتها جماعات بشرية.", [
+    M("ماذا تؤكد الدلائل والآثار في ختام الدرس الثاني؟", "أن الكويت سكنتها جماعات بشرية منذ القدم", ["أن الكويت أرض غير مأهولة", "أن الاستيطان بدأ بعد اكتشاف النفط", "أن الكويت أُسست في القرن الثامن عشر فقط"]),
+    M("أكمل: كل هذه الدلائل والآثار لا تدع مجالاً للشك بأن الكويت ومنذ القدم سكنتها ........", "جماعات بشرية", ["القبائل البدوية فقط", "الجيوش الأجنبية", "التجار الأجانب فقط"]),
+    T("تدل الآثار على أن أرض الكويت سكنتها جماعات بشرية منذ القدم.", true),
+    T("تدع الآثار مجالاً للشك في قدم الاستيطان البشري في الكويت.", false),
+  ]);
+
+  // ---------- generated styles: ordering & matching (like the sample exam's «توصيل») ----------
+  const timeline = D.tables.find((t) => t.id === "timeline").rows;
+  const orderGen = (lessons, first) => () => {
+    const rows = timeline.filter((r) => lessons.includes(r.lesson));
+    const byYear = []; const seen = new Set();
+    for (const r of pick(rows, rows.length)) { const y = num(r.year); if (!seen.has(y)) { seen.add(y); byYear.push(r); } }
+    const four = byYear.slice(0, 4).sort((a, b) => num(a.year) - num(b.year));
+    if (four.length < 4) return null;
+    const pickRow = first ? four[0] : four[3];
+    return { q: first ? "أي الأحداث التالية وقع أولاً (الأقدم زمناً)؟" : "أي الأحداث التالية وقع أخيراً (الأحدث زمناً)؟", a: pickRow.event, wrong: four.filter((r) => r !== pickRow).map((r) => r.event),
+      explain: four.map((r) => `${r.event} (${r.year}م)`).join(" • ") };
+  };
+  const betweenGen = (lessons) => () => {
+    const rows = timeline.filter((r) => lessons.includes(r.lesson));
+    const [a, b] = pick(rows.filter((r) => !isNaN(num(r.year))), 2);
+    if (!a || !b || num(a.year) === num(b.year)) return null;
+    const earlier = num(a.year) < num(b.year) ? a : b, later = earlier === a ? b : a;
+    const ev = (r) => r.event.replace(/[.،]$/, "");
+    return { q: `أي العبارات التالية عن «${ev(a)}» و«${ev(b)}» صحيحة؟`, a: `«${ev(earlier)}» وقع قبل «${ev(later)}»`,
+      wrong: [`«${ev(later)}» وقع قبل «${ev(earlier)}»`, "وقعا في العام نفسه", "لا يمكن تحديد أيهما أسبق"], explain: `${ev(earlier)}: ${earlier.year}م • ${ev(later)}: ${later.year}م` };
+  };
+  I("gen-order1", 1, "ترتيب أحداث الدرس الأول زمنياً.", [orderGen([1], true), orderGen([1], false), betweenGen([1])]);
+  I("gen-order2", 2, "ترتيب أحداث الدرس الثاني زمنياً.", [orderGen([2], true), orderGen([2], false), betweenGen([2])]);
+  I("gen-order12", 1, "ترتيب أحداث الدرسين زمنياً.", [orderGen([1, 2], true), orderGen([1, 2], false), betweenGen([1, 2])]);
+
+  // matching: "which pairing is correct?" — correct option is the true pairing; others swap two pairs
+  const matchGen = (pairs, qText) => () => {
+    const three = pick(pairs, 3); if (three.length < 3) return null;
+    const lefts = three.map((p) => p[0]), rights = three.map((p) => p[1]);
+    const fmt = (rs) => lefts.map((l, i) => `${l} ← ${rs[i]}`).join(" | ");
+    const perms = [[1, 0, 2], [0, 2, 1], [2, 1, 0], [1, 2, 0], [2, 0, 1]].map((p) => p.map((i) => rights[i]));
+    return { q: qText, a: fmt(rights), wrong: pick(perms, 3).map(fmt), explain: three.map((p) => `${p[0]} ← ${p[1]}`).join(" • ") };
+  };
+  const bookPairs = D.tables.find((t) => t.id === "books").rows.map((r) => [r.author, `«${r.title}»`]);
+  const yearPairs = D.tables.find((t) => t.id === "books").rows.filter((r) => r.year).map((r) => [`«${r.title}»`, `${r.year}م`]);
+  const westPairs = D.tables.find((t) => t.id === "westerners").rows.filter((r) => r.year).map((r) => [r.person, `${r.year}م`]);
+  const rolePairs = D.tables.find((t) => t.id === "westerners").rows.map((r) => [r.person, r.role]);
+  const sitePairs = [["فيلكا", "إيكاروس"], ["الصبية", "حضارة العبيد"], ["كاظمة", "محطة على طريق التجارة والحج"], ["عكاز", "شمال غرب ميناء الشويخ"], ["تل سعيد", "القلعة الهلنستية"]];
+  const missionPairs = [["بعثة أرهوس الدنماركي", "1958م"], ["البعثة الكويتية–البريطانية", "1998م"], ["البعثة الكويتية–البولندية", "2007م"]];
+  const namePairs = [["الإغريق", "الخليج الفارسي"], ["الرومان", "الخليج العربي"], ["العهد الإسلامي", "بحر العرب"]];
+  const locPairs = [["العراق", "الشمال"], ["السعودية", "الجنوب والغرب"], ["الخليج العربي", "الشرق"]];
+  I("gen-match1", 1, "توصيل: المؤلف بكتابه / الكتاب بسنة صدوره / الشخصية بسنتها / الشخصية بصفتها.", [
+    matchGen(bookPairs, "صِل كل مؤلف بكتابه — أي توصيل صحيح؟"),
+    matchGen(yearPairs, "صِل كل كتاب بسنة صدوره — أي توصيل صحيح؟"),
+    matchGen(westPairs, "صِل كل شخصية غربية بالسنة المرتبطة بها — أي توصيل صحيح؟"),
+    matchGen(rolePairs, "صِل كل شخصية بوظيفتها/صفتها — أي توصيل صحيح؟"),
+  ]);
+  I("gen-match2", 2, "توصيل: المواقع الأثرية، البعثات، تسميات الخليج، حدود الكويت.", [
+    matchGen(sitePairs, "صِل كل موقع بما يرتبط به — أي توصيل صحيح؟"),
+    matchGen(missionPairs, "صِل كل بعثة بسنة بدء أعمالها — أي توصيل صحيح؟"),
+    matchGen(namePairs, "صِل كل جهة بالاسم الذي أطلقته على الخليج — أي توصيل صحيح؟"),
+    matchGen(locPairs, "صِل كل حد جغرافي بجهته من الكويت — أي توصيل صحيح؟"),
+  ]);
+})();
+
+// Reads window.DECK (see kuwait history/practice-data.js for the format).
+// Every fact can be asked in several formats; facts you miss get weighted up
+// and come back a few questions later in a different format.
+(function () {
+  "use strict";
+  const D = window.DECK;
+  const KEY = "quiz-progress:" + D.id;
+  const AR = D.lang === "ar";
+  const T = AR ? {
+    all: "كل الدروس", lesson: "الدرس", smart: "تدريب ذكي", mistakes: "أخطائي فقط",
+    stats: "الإحصائيات", next: "التالي", right: "إجابة صحيحة!", wrong: "إجابة خاطئة",
+    correctIs: "الإجابة الصحيحة:", true: "صح", false: "خطأ", tf: "صح أم خطأ",
+    mcq: "اختيار من متعدد", session: "هذه الجلسة", streak: "متتالية", mastered: "متقَن",
+    facts: "معلومة", accuracy: "الدقة", answered: "أُجيب", weakest: "أضعف المعلومات",
+    reset: "مسح التقدم", resetQ: "مسح كل التقدم المحفوظ؟", noMistakes: "لا توجد أخطاء حالياً 🎉 — عدنا للتدريب الذكي.",
+    close: "إغلاق", none: "لا شيء بعد", keys: "المفاتيح: 1–4 للاختيار • Enter للتالي", again: "سؤال متكرر بصيغة مختلفة",
+    never: "لم يُسأل بعد",
+    short: "إجابة قصيرة", open: "سؤال مقالي", typeHere: "اكتب إجابتك هنا…", check: "تحقق",
+    yourAnswer: "إجابتك:", override: "إجابتي صحيحة — احتسبها", overridden: "تم احتسابها صحيحة ✓",
+    openHint: "فكّر في الإجابة أو اكتبها، ثم اضغط «أظهر الإجابة» وقيّم نفسك بصدق.",
+    writeHere: "اكتب إجابتك (اختياري)…", show: "أظهر الإجابة", model: "الإجابة النموذجية:",
+    iKnew: "عرفتها ✓", iDidnt: "لم أعرفها ✗",
+  } : {
+    all: "All", lesson: "Lesson", smart: "Smart practice", mistakes: "Mistakes only",
+    stats: "Stats", next: "Next", right: "Correct!", wrong: "Wrong",
+    correctIs: "Correct answer:", true: "True", false: "False", tf: "True / False",
+    mcq: "Multiple choice", session: "This session", streak: "streak", mastered: "mastered",
+    facts: "facts", accuracy: "Accuracy", answered: "Answered", weakest: "Weakest facts",
+    reset: "Reset progress", resetQ: "Erase all saved progress?", noMistakes: "No open mistakes 🎉 — back to smart practice.",
+    close: "Close", none: "Nothing yet", keys: "Keys: 1–4 to answer • Enter for next", again: "Retry in a new format",
+    never: "not asked yet",
+    short: "Short answer", open: "Explain", typeHere: "Type your answer…", check: "Check",
+    yourAnswer: "Your answer:", override: "I was right — count it", overridden: "Counted as correct ✓",
+    openHint: "Think through (or type) your answer, then reveal it and grade yourself honestly.",
+    writeHere: "Your answer (optional)…", show: "Show answer", model: "Model answer:",
+    iKnew: "I knew it ✓", iDidnt: "I didn't ✗",
+  };
+
+  // ---------- helpers ----------
+  const rnd = (n) => Math.floor(Math.random() * n);
+  const shuffle = (a) => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = rnd(i + 1); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  const uniq = (a) => [...new Set(a)];
+  const sample = (a, k) => shuffle(a).slice(0, k);
+  const num = (v) => { const m = String(v).match(/\d+/); return m ? +m[0] : NaN; };
+  const placeholders = (s) => [...s.matchAll(/\{(\w+)\}/g)].map((m) => m[1]);
+  const fill = (s, row) => s.replace(/\{(\w+)\}/g, (_, f) => {
+    if (f === "yearText") return row.year ? ` (${row.year}${AR ? "م" : ""})` : "";
+    return row[f] ?? "";
+  });
+  const raw = (s) => (/^\s*<svg/.test(s) ? s : esc(s));
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+  // ---------- short-answer matching (tolerant of Arabic spelling variants) ----------
+  const STOP = new Set(["من", "في", "و", "عن", "على", "الى", "ان", "بن", "ابن", "the", "of", "a", "an", "and"]);
+  const norm = (x) => String(x).toLowerCase()
+    .replace(/\([^)]*\)/g, " ")                       // drop parenthetical notes
+    .replace(/[\u064B-\u0652\u0640]/g, "")             // tashkeel + tatweel
+    .replace(/[أإآٱ]/g, "ا").replace(/ة/g, "ه").replace(/ى/g, "ي").replace(/ؤ/g, "و").replace(/ئ/g, "ي")
+    .replace(/[٠-٩]/g, (d) => "٠١٢٣٤٥٦٧٨٩".indexOf(d))
+    .replace(/[«»"'“”.,،؛:؟?!\-–—_/]/g, " ")
+    .replace(/(\d)(?=\D)|(\D)(?=\d)/g, "$1$2 ")              // split "ف3" / "و1865"
+    .replace(/\s+/g, " ").trim();
+  const toks = (x) => norm(x).split(" ")
+    .map((w) => (w.length > 4 && w.startsWith("ال") ? w.slice(2) : w))
+    .map((w) => (w.length > 4 && /^(وال|بال|لل)/.test(w) ? w.slice(3) : w))
+    .filter((w) => w && !STOP.has(w) && !/^\d+$/.test(w) && w !== "م" && w !== "هـ" && w !== "ه");
+  const nums = (x) => (norm(x).match(/\d+/g) || []).map(Number);
+  function lev(a, b) {
+    const d = Array.from({ length: a.length + 1 }, (_, i) => [i]);
+    for (let j = 1; j <= b.length; j++) d[0][j] = j;
+    for (let i = 1; i <= a.length; i++) for (let j = 1; j <= b.length; j++)
+      d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+    return d[a.length][b.length];
+  }
+  const tokEq = (a, b) => a === b || (a.length >= 4 && b.length >= 4 && lev(a, b) <= 1);
+  function matches(input, answer) {
+    if (!norm(input)) return false;
+    if (norm(input) === norm(answer) || norm(input).replace(/ /g, "") === norm(answer).replace(/ /g, "")) return true;
+    const an = nums(answer), inN = nums(input);
+    const at = toks(answer), it = toks(input);
+    if (an.length && !at.length) return inN.length > 0 && inN.every((n) => an.includes(n)); // numeric answers (years…)
+    if (an.length && !inN.some((n) => an.includes(n)) && inN.length) return false;
+    if (!at.length || !it.length) return false;
+    if (!it.every((w) => at.some((a) => tokEq(w, a)))) return false;      // nothing extra/wrong typed
+    const covered = at.filter((a) => it.some((w) => tokEq(w, a)));
+    return covered.length * 2 >= at.length || covered.includes(at[at.length - 1]);
+  }
+  const sameAs = (a, b) => norm(a).replace(/ /g, "") === norm(b).replace(/ /g, "");
+  // reject = other known answers (e.g. a different book's title) that a partial match must not slip through as
+  const grade = (input, accepts, reject = []) => !reject.some((r) => sameAs(input, r)) && accepts.some((a) => matches(input, a));
+
+  // ---------- state ----------
+  function load() {
+    try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.facts) return s; } catch (e) {}
+    return { facts: {}, variants: {}, total: { right: 0, wrong: 0 } };
+  }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+  let S = load();
+  const fs = (id) => (S.facts[id] ||= { box: 0, seen: 0, right: 0, wrong: 0, label: "" });
+
+  // ---------- question builders ----------
+  // Distractor values for `field` that are wrong given the row's other shown fields.
+  function wrongValues(t, row, field, given) {
+    const peers = t.rows.filter((r) => given.every((g) => r[g] === row[g]));
+    const valid = new Set(peers.map((r) => r[field]));
+    let pool = uniq([...t.rows.map((r) => r[field]), ...((t.extra || {})[field] || [])]).filter((v) => v && !valid.has(v));
+    if ((t.numeric || []).includes(field) && !isNaN(num(row[field]))) {
+      const x = num(row[field]);
+      pool = pool.filter((v) => !isNaN(num(v))).sort((a, b) => Math.abs(num(a) - x) - Math.abs(num(b) - x)).slice(0, 6);
+    }
+    return pool;
+  }
+
+  function tableQuestion(t, row, tpl) {
+    const explain = t.explain ? fill(t.explain, row) : "";
+    if (tpl.tf) {
+      const shown = placeholders(tpl.q + (tpl.fig || ""));
+      if (shown.some((f) => !row[f])) return null;
+      const given = shown.filter((f) => f !== tpl.tf);
+      const pool = wrongValues(t, row, tpl.tf, given);
+      const truth = pool.length === 0 || Math.random() < 0.5;
+      const r2 = truth ? row : { ...row, [tpl.tf]: pool[rnd(Math.min(pool.length, 3))] };
+      return withFig(tf(fill(tpl.q, r2), truth, (truth ? "" : fill(tpl.q, row) + "\n") + explain), tpl, row);
+    }
+    const ask = [].concat(tpl.ask);
+    const given = placeholders(tpl.q + (tpl.fig || ""));
+    if ([...ask, ...given].some((f) => !row[f])) return null;
+    const key = (r) => ask.map((f) => r[f]).join(" — ");
+    let wrong;
+    if (ask.length === 1) {
+      wrong = sample(wrongValues(t, row, ask[0], given).slice(0, 8), 3);
+    } else {
+      // combos: prefer "near misses" that share all but one field with the answer
+      const vals = ask.map((f) => uniq([...t.rows.map((r) => r[f]), ...((t.extra || {})[f] || [])]).filter(Boolean));
+      const peers = new Set(t.rows.filter((r) => given.every((g) => r[g] === row[g])).map(key));
+      const near = [], far = [];
+      const rec = (i, acc) => {
+        if (i === ask.length) {
+          const k = acc.join(" — "); if (peers.has(k)) return;
+          const diff = acc.filter((v, j) => v !== row[ask[j]]).length;
+          (diff === 1 ? near : far).push(k); return;
+        }
+        vals[i].forEach((v) => rec(i + 1, [...acc, v]));
+      };
+      rec(0, []);
+      wrong = [...sample(near, 2), ...sample(far, 3)].slice(0, 3);
+      if (wrong.length < 3) wrong = uniq([...wrong, ...sample(near, 3)]).slice(0, 3);
+    }
+    if (wrong.length < 1) return null;
+    const q = withFig(mcq(fill(tpl.q, row), key(row), wrong, explain), tpl, row);
+    if (tpl.short && ask.length === 1) {
+      q.shortOk = true;
+      q.accept = uniq(t.rows.filter((r) => given.every((g) => r[g] === row[g])).map((r) => r[ask[0]]));
+      q.reject = uniq([...t.rows.map((r) => r[ask[0]]), ...((t.extra || {})[ask[0]] || [])]).filter((v) => v && !q.accept.includes(v));
+    }
+    return q;
+  }
+  const withFig = (q, tpl, row) => (tpl.fig ? { ...q, fig: fill(tpl.fig, row) } : q);
+
+  function mcq(q, a, wrong, explain) {
+    const choices = shuffle([a, ...sample(wrong, 3)]);
+    return { kind: "mcq", q, choices, correct: choices.indexOf(a), explain };
+  }
+  function tf(q, truth, explain) {
+    return { kind: "tf", q, choices: [T.true, T.false], correct: truth ? 0 : 1, explain };
+  }
+
+  // ---------- facts ----------
+  // fact = { id, lesson, variants: [() => question|null] }
+  const FACTS = [];
+  for (const t of D.tables || []) {
+    for (const row of t.rows) {
+      const variants = t.templates.map((tpl) => () => tableQuestion(t, row, tpl))
+        .filter((_, i) => { const tpl = t.templates[i]; const need = [...placeholders(tpl.q + (tpl.fig || "")), ...(tpl.ask ? [].concat(tpl.ask) : [])]; return need.every((f) => row[f]); });
+      FACTS.push({ id: t.id + ":" + row.id, lesson: row.lesson ?? t.lesson, group: t.label, variants });
+    }
+  }
+  for (const L of D.lists || []) {
+    const explain = L.label + ": " + L.members.join(" • ");
+    const variants = [
+      () => mcq(AR ? `أي مما يلي من ${L.label}؟` : `Which of these is one of: ${L.label}?`, L.members[rnd(L.members.length)], L.distractors, explain),
+      () => L.members.length >= 3 ? mcq(AR ? `أي مما يلي ليس من ${L.label}؟` : `Which of these is NOT one of: ${L.label}?`, L.distractors[rnd(L.distractors.length)], L.members, explain) : null,
+      () => { const truth = Math.random() < 0.5; const x = truth ? L.members[rnd(L.members.length)] : L.distractors[rnd(L.distractors.length)];
+              return tf(AR ? `«${x}» من ${L.label}.` : `"${x}" is one of: ${L.label}.`, truth, explain); },
+    ];
+    FACTS.push({ id: "list:" + L.id, lesson: L.lesson, group: L.label, variants });
+  }
+  for (const it of D.items || []) {
+    const variants = it.variants.map((v0) => () => {
+      const v = typeof v0 === "function" ? v0() : v0;
+      if (!v) return null;
+      if (v.open) return { kind: "open", q: v.open, model: v.model, explain: v.explain || it.explain };
+      const q = v.tf !== undefined ? tf(v.tf, v.answer, v.explain || it.explain) : mcq(v.q, v.a, v.wrong, v.explain || it.explain);
+      if (v.short) { q.shortOk = true; q.accept = [v.a, ...(v.accept || [])]; q.reject = v.wrong; }
+      return v.fig ? { ...q, fig: v.fig } : q;
+    });
+    FACTS.push({ id: "item:" + it.id, lesson: it.lesson, group: "", variants });
+  }
+
+  // ---------- scheduler ----------
+  const BOX_W = [8, 5, 3, 1.6, 0.9, 0.5];
+  let filterLesson = 0, mode = "smart";
+  let counter = 0, recent = [], requeue = [];
+  let session = { right: 0, wrong: 0, streak: 0 };
+  let current = null;
+
+  const pool = () => FACTS.filter((f) => filterLesson ? f.lesson === filterLesson : (!D.activeLessons || D.activeLessons.includes(f.lesson)));
+  const isMistake = (f) => { const s = S.facts[f.id]; return s && s.wrong > 0 && s.box < 2; };
+  const weight = (f) => { const s = S.facts[f.id]; return !s || !s.seen ? 4 : BOX_W[s.box]; };
+
+  function pickFact() {
+    let candidates = pool();
+    if (mode === "mistakes") {
+      const m = candidates.filter(isMistake);
+      if (m.length) candidates = m; else { mode = "smart"; toast(T.noMistakes); renderTop(); }
+    }
+    const due = requeue.findIndex((r) => r.at <= counter && candidates.some((f) => f.id === r.id));
+    if (due >= 0) { const r = requeue.splice(due, 1)[0]; return { fact: FACTS.find((f) => f.id === r.id), avoid: r.avoid, again: true }; }
+    const fresh = candidates.filter((f) => !recent.includes(f.id));
+    const list = fresh.length ? fresh : candidates;
+    let total = list.reduce((s, f) => s + weight(f), 0), x = Math.random() * total;
+    for (const f of list) { x -= weight(f); if (x <= 0) return { fact: f }; }
+    return { fact: list[list.length - 1] };
+  }
+
+  function buildQuestion() {
+    for (let tries = 0; tries < 20; tries++) {
+      const { fact, avoid, again } = pickFact();
+      // least-used variant first, skipping the one just missed
+      const order = fact.variants.map((_, i) => i)
+        .filter((i) => fact.variants.length === 1 || i !== avoid)
+        .sort((a, b) => ((S.variants[fact.id + "#" + a] || 0) - (S.variants[fact.id + "#" + b] || 0)) || Math.random() - 0.5);
+      for (const vi of order) {
+        let q = fact.variants[vi]();
+        if (!q) continue;
+        if (q.shortOk && Math.random() < (D.shortRate || 0))
+          q = { kind: "short", q: q.q, fig: q.fig, answerText: q.choices[q.correct], accept: q.accept, reject: q.reject, explain: q.explain };
+        return { ...q, fact, vi, again: again && vi !== avoid };
+      }
+    }
+    return null;
+  }
+
+  function answer(i) {
+    if (!current || current.answered) return;
+    const ok = i === current.correct;
+    record(ok);
+    renderFeedback(i, ok);
+  }
+
+  let undo = null;
+  function record(ok) {
+    current.answered = true;
+    const s = fs(current.fact.id);
+    undo = { fact: { ...s }, total: { ...S.total }, session: { ...session }, requeue: requeue.length };
+    s.seen++; s.label = current.q.slice(0, 90);
+    S.variants[current.fact.id + "#" + current.vi] = (S.variants[current.fact.id + "#" + current.vi] || 0) + 1;
+    if (ok) { s.right++; s.box = Math.min(5, s.box + 1); S.total.right++; session.right++; session.streak++; }
+    else {
+      s.wrong++; s.box = 0; S.total.wrong++; session.wrong++; session.streak = 0;
+      requeue.push({ id: current.fact.id, at: counter + 3 + rnd(3), avoid: current.vi });
+    }
+    save();
+    renderTop();
+  }
+  function overrideToCorrect() {
+    if (!undo) return;
+    S.facts[current.fact.id] = undo.fact; S.total = undo.total; session = undo.session; requeue.length = undo.requeue;
+    S.variants[current.fact.id + "#" + current.vi]--;
+    record(true);
+    undo = null;
+  }
+
+  function answerShort() {
+    if (!current || current.answered) return;
+    const input = app.querySelector("#saInput").value;
+    if (!input.trim()) return;
+    const ok = grade(input, current.accept, current.reject);
+    record(ok);
+    app.querySelector("#saInput").disabled = true;
+    app.querySelector("#saCheck").disabled = true;
+    const card = app.querySelector("#card"), fb = card.querySelector("#fb");
+    fb.hidden = false;
+    fb.className = "feedback " + (ok ? "ok" : "bad");
+    fb.innerHTML = `
+      <div class="verdict">${ok ? "✓ " + T.right : "✗ " + T.wrong}</div>
+      ${ok ? "" : `<div class="answer">${T.yourAnswer} <span class="mine">${esc(input)}</span></div>`}
+      <div class="answer">${T.correctIs} <b>${esc(current.answerText)}</b></div>
+      ${current.explain ? `<div class="explain">${esc(current.explain).replace(/\n/g, "<br>")}</div>` : ""}
+      <div class="fb-actions">
+        <button class="primary" id="nextBtn">${T.next} ${AR ? "←" : "→"}</button>
+        ${ok ? "" : `<button class="ghost" id="overrideBtn">${T.override}</button>`}
+      </div>`;
+    wireNext(fb);
+    const ob = fb.querySelector("#overrideBtn");
+    if (ob) ob.onclick = () => {
+      overrideToCorrect();
+      fb.className = "feedback ok";
+      fb.querySelector(".verdict").textContent = "✓ " + T.overridden;
+      ob.remove(); fb.querySelector("#nextBtn").focus();
+    };
+  }
+
+  function revealOpen() {
+    const card = app.querySelector("#card"), fb = card.querySelector("#fb");
+    card.querySelector("#showBtn").remove();
+    const ta = card.querySelector("#openInput"); if (ta) ta.readOnly = true;
+    fb.hidden = false; fb.className = "feedback neutral";
+    fb.innerHTML = `
+      <div class="answer"><b>${T.model}</b></div>
+      <div class="model">${esc(current.model).replace(/\n/g, "<br>")}</div>
+      <div class="fb-actions">
+        <button class="primary okb" id="knewBtn">${T.iKnew}</button>
+        <button class="primary badb" id="didntBtn">${T.iDidnt}</button>
+      </div>`;
+    const rate = (ok) => {
+      record(ok);
+      fb.className = "feedback " + (ok ? "ok" : "bad");
+      fb.querySelector(".fb-actions").innerHTML = `<button class="primary" id="nextBtn">${T.next} ${AR ? "←" : "→"}</button>`;
+      wireNext(fb);
+    };
+    fb.querySelector("#knewBtn").onclick = () => rate(true);
+    fb.querySelector("#didntBtn").onclick = () => rate(false);
+    fb.querySelector("#knewBtn").focus({ preventScroll: true });
+  }
+  function wireNext(fb) {
+    const nb = fb.querySelector("#nextBtn");
+    nb.onclick = next; nb.focus({ preventScroll: true });
+  }
+
+  function next() {
+    counter++;
+    current = buildQuestion();
+    if (current) { recent.push(current.fact.id); recent = recent.slice(-5); }
+    renderQuestion();
+  }
+
+  // ---------- UI ----------
+  const app = document.getElementById("app");
+  document.documentElement.dir = AR ? "rtl" : "ltr";
+  document.documentElement.lang = D.lang;
+  const THEME_KEY = "quiz-theme";
+  const setTheme = (t) => { document.documentElement.dataset.theme = t; try { localStorage.setItem(THEME_KEY, t); } catch (e) {} };
+  let theme = "dark";
+  try { theme = localStorage.getItem(THEME_KEY) || "dark"; } catch (e) {}
+  document.documentElement.dataset.theme = theme;
+  app.innerHTML = `
+    <header class="top">
+      <div class="title-row">
+        <h1>${esc(D.title)}</h1>
+        <div class="title-actions">
+          <button class="ghost" id="themeBtn" aria-label="Toggle light/dark">${theme === "dark" ? "☀️" : "🌙"}</button>
+          <button class="ghost" id="statsBtn">${T.stats}</button>
+        </div>
+      </div>
+      <div class="chips" id="lessons"></div>
+      <div class="row">
+        <div class="seg" id="modes">
+          <button data-mode="smart">${T.smart}</button>
+          <button data-mode="mistakes">${T.mistakes} <span class="badge" id="mistakeCount"></span></button>
+        </div>
+        <div class="score" id="score"></div>
+      </div>
+    </header>
+    <main class="card" id="card"></main>
+    <p class="hint">${T.keys}</p>
+    <div class="toast" id="toast"></div>
+    <dialog id="stats"></dialog>`;
+
+  const lessonsEl = app.querySelector("#lessons");
+  lessonsEl.innerHTML = [{ n: 0, name: T.all }, ...D.lessons].map((l) =>
+    `<button data-l="${l.n}" title="${esc(l.name)}">${l.n ? `${T.lesson} ${l.n}<small>${esc(l.name)}</small>` : (D.activeLessons ? `${T.lesson} ${D.activeLessons.join(" + ")}<small>${AR ? "كل ما في الاختبار" : "Quiz scope"}</small>` : T.all)}</button>`).join("");
+  lessonsEl.onclick = (e) => { const b = e.target.closest("button"); if (!b) return; filterLesson = +b.dataset.l; requeue = []; renderTop(); next(); };
+  app.querySelector("#modes").onclick = (e) => { const b = e.target.closest("button"); if (!b) return; mode = b.dataset.mode; renderTop(); next(); };
+  app.querySelector("#statsBtn").onclick = openStats;
+  app.querySelector("#themeBtn").onclick = (e) => {
+    theme = theme === "dark" ? "light" : "dark"; setTheme(theme);
+    e.currentTarget.textContent = theme === "dark" ? "☀️" : "🌙";
+  };
+
+  function renderTop() {
+    lessonsEl.querySelectorAll("button").forEach((b) => b.classList.toggle("on", +b.dataset.l === filterLesson));
+    app.querySelectorAll("#modes button").forEach((b) => b.classList.toggle("on", b.dataset.mode === mode));
+    const mc = pool().filter(isMistake).length;
+    app.querySelector("#mistakeCount").textContent = mc || "";
+    app.querySelector("#score").innerHTML =
+      `<span class="ok">✓ ${session.right}</span><span class="bad">✗ ${session.wrong}</span><span class="st">🔥 ${session.streak}</span>`;
+  }
+
+  function renderQuestion() {
+    const card = app.querySelector("#card");
+    if (!current) { card.innerHTML = `<p>${T.none}</p>`; return; }
+    const q = current;
+    const lesson = D.lessons.find((l) => l.n === q.fact.lesson);
+    card.innerHTML = `
+      <div class="meta">
+        <span class="tag">${lesson ? `${T.lesson} ${lesson.n}` : ""}</span>
+        <span class="tag soft ${q.kind}">${{ tf: T.tf, mcq: T.mcq, short: T.short, open: T.open }[q.kind]}</span>
+        ${q.again ? `<span class="tag warn">↻ ${T.again}</span>` : ""}
+      </div>
+      <h2 class="q">${esc(q.q)}</h2>
+      ${q.fig ? `<div class="fig">${q.fig}</div>` : ""}
+      ${q.kind === "short" ? `
+      <form class="sa" id="saForm" autocomplete="off">
+        <input id="saInput" type="text" placeholder="${T.typeHere}" autocomplete="off" spellcheck="false">
+        <button class="primary" id="saCheck" type="submit">${T.check}</button>
+      </form>` : q.kind === "open" ? `
+      <p class="muted small">${T.openHint}</p>
+      <textarea id="openInput" rows="4" placeholder="${T.writeHere}"></textarea>
+      <button class="primary" id="showBtn">${T.show}</button>` : `
+      <div class="choices ${q.kind}">
+        ${q.choices.map((c, i) => `<button class="choice" data-i="${i}"><span class="k">${i + 1}</span><span class="t">${raw(c)}</span></button>`).join("")}
+      </div>`}
+      <div class="feedback" id="fb" hidden></div>`;
+    if (q.kind === "short") {
+      card.querySelector("#saForm").onsubmit = (e) => { e.preventDefault(); answerShort(); };
+      card.querySelector("#saInput").focus({ preventScroll: true });
+    } else if (q.kind === "open") {
+      card.querySelector("#showBtn").onclick = revealOpen;
+    } else {
+      card.querySelector(".choices").onclick = (e) => { const b = e.target.closest(".choice"); if (b) answer(+b.dataset.i); };
+    }
+    card.classList.remove("pop"); void card.offsetWidth; card.classList.add("pop");
+  }
+
+  function renderFeedback(chosen, ok) {
+    const card = app.querySelector("#card");
+    card.querySelectorAll(".choice").forEach((b, i) => {
+      b.disabled = true;
+      if (i === current.correct) b.classList.add("correct");
+      else if (i === chosen) b.classList.add("chosen-wrong");
+      else b.classList.add("dim");
+    });
+    const fb = card.querySelector("#fb");
+    fb.hidden = false;
+    fb.className = "feedback " + (ok ? "ok" : "bad");
+    fb.innerHTML = `
+      <div class="verdict">${ok ? "✓ " + T.right : "✗ " + T.wrong}</div>
+      ${ok ? "" : `<div class="answer">${T.correctIs} <b>${raw(current.choices[current.correct])}</b></div>`}
+      ${current.explain ? `<div class="explain">${esc(current.explain).replace(/\n/g, "<br>")}</div>` : ""}
+      <button class="primary" id="nextBtn">${T.next} ${AR ? "←" : "→"}</button>`;
+    wireNext(fb);
+  }
+
+  function openStats() {
+    const dlg = app.querySelector("#stats");
+    const facts = pool();
+    const seen = facts.filter((f) => S.facts[f.id]?.seen);
+    const mastered = facts.filter((f) => (S.facts[f.id]?.box || 0) >= 3).length;
+    const tot = S.total.right + S.total.wrong;
+    const weak = seen.map((f) => ({ f, s: S.facts[f.id] }))
+      .filter((x) => x.s.wrong > 0)
+      .sort((a, b) => a.s.box - b.s.box || b.s.wrong - a.s.wrong).slice(0, 10);
+    const byLesson = D.lessons.map((l) => {
+      const fl = FACTS.filter((f) => f.lesson === l.n);
+      const m = fl.filter((f) => (S.facts[f.id]?.box || 0) >= 3).length;
+      return `<div class="bar"><span>${T.lesson} ${l.n}</span><div class="track"><i style="width:${(100 * m / fl.length).toFixed(0)}%"></i></div><span>${m}/${fl.length}</span></div>`;
+    }).join("");
+    dlg.innerHTML = `
+      <div class="dlg">
+        <h3>${T.stats}</h3>
+        <div class="kpis">
+          <div><b>${tot}</b><span>${T.answered}</span></div>
+          <div><b>${tot ? Math.round(100 * S.total.right / tot) : 0}%</b><span>${T.accuracy}</span></div>
+          <div><b>${mastered}/${facts.length}</b><span>${T.mastered}</span></div>
+        </div>
+        ${byLesson}
+        <h4>${T.weakest}</h4>
+        ${weak.length ? `<ol class="weak">${weak.map((x) => `<li><span>${esc(x.s.label)}</span><em>✗${x.s.wrong} ✓${x.s.right}</em></li>`).join("")}</ol>` : `<p class="muted">${T.none}</p>`}
+        <div class="dlg-actions">
+          <button class="ghost danger" id="resetBtn">${T.reset}</button>
+          <button class="primary" id="closeBtn">${T.close}</button>
+        </div>
+      </div>`;
+    dlg.querySelector("#closeBtn").onclick = () => dlg.close();
+    dlg.querySelector("#resetBtn").onclick = () => {
+      if (!confirm(T.resetQ)) return;
+      S = { facts: {}, variants: {}, total: { right: 0, wrong: 0 } }; save();
+      session = { right: 0, wrong: 0, streak: 0 }; requeue = [];
+      dlg.close(); renderTop(); next();
+    };
+    dlg.showModal();
+  }
+
+  let toastTimer;
+  function toast(msg) {
+    const el = app.querySelector("#toast"); el.textContent = msg; el.classList.add("show");
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove("show"), 2600);
+  }
+
+  document.addEventListener("keydown", (e) => {
+    if (app.querySelector("#stats").open) return;
+    const typing = /^(INPUT|TEXTAREA)$/.test(e.target.tagName) && !e.target.disabled && !e.target.readOnly;
+    if (typing || (current && !current.answered && current.kind === "open")) return;
+    if (e.target.tagName === "BUTTON" && e.key === "Enter" && e.target.id !== "nextBtn") return;
+    if (current && !current.answered) {
+      if (!current.choices) return;
+      const n = parseInt(e.key, 10);
+      if (n >= 1 && n <= current.choices.length) answer(n - 1);
+    } else if (current && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); next(); }
+  });
+
+  // expose for testing
+  window.__quiz = { FACTS, buildQuestion, matches, grade };
+  renderTop();
+  next();
+})();
+
+  </script>
+</body>
+</html>
